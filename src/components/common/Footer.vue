@@ -4,7 +4,7 @@
       <div class="row sns_icons">
         <div 
         class="col hoverable"
-        v-for="icon in iconName" :key="icon"
+        v-for="icon in iconNames" :key="icon.url"
         >
           <icon-btn
           :iconName="icon"
@@ -29,12 +29,13 @@ export default {
   name: 'FooterBar',
   components: {IconBtn},
   data: () => ({
-    iconName: [
-      "logos:twitter", 
-      "logos:facebook", 
-      "logos:instagram-icon", 
-      "logos:github-icon", 
-      "simple-icons:qiita"]
+    iconNames: [
+      {logo: "logos:twitter", url: "https://twitter.com/sukeo_sukeo"}, 
+      {logo: "logos:facebook", url: "1"}, 
+      {logo: "logos:instagram-icon", url: "2"}, 
+      {logo: "logos:github-icon", url: "https://github.com/sukeo-sukeo"}, 
+      {logo: "simple-icons:qiita", url: "https://qiita.com/sukeo-sukeo"},
+    ]
   })
 }
 </script>

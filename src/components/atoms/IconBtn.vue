@@ -1,12 +1,14 @@
 <template>
-  <span class="iconify" data-inline="false" :data-icon="iconName"></span>
+  <a :href="iconName.url" target="_blank">
+    <span class="iconify" data-inline="false" :data-icon="iconName.logo"></span>
+  </a>
 </template>
 
 <script>
 export default {
   name: 'IconBtn',
   props: {
-    iconName: String
+    iconName: [Object, Array]
   }
 }
 </script>

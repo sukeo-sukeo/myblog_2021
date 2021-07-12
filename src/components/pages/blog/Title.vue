@@ -3,6 +3,7 @@
 
     <div class="card-image">
       <img class="responsive-img" :src="`data:image/png;base64,${blogData.thumImg}`">
+      <span v-if="judgeNewContent" class="new badge pulse red new_badge"></span>
     </div>
 
     <div class="card-staced">
@@ -11,7 +12,7 @@
         <small>{{ blogData.createdAt }}</small>
       </div>
       <div class="divider"></div>
-      <div class="blog_tags hide-on-small-only">
+      <div class="blog_tags">
         <small class="chip" v-for="tag in blogData.tag.split(',')" :key="tag">{{tag}}</small>
       </div>
     </div>
@@ -31,6 +32,12 @@ export default {
   }),
   props: {
     blogData: [Object, Array],
+  },
+  computed: {
+    judgeNewContent() {
+      console.log('return boolean');
+      return true
+    }
   },
   methods: {
     
@@ -54,6 +61,7 @@ export default {
 .card-image {
   width: 300px;
   min-width: 150px;
+  position: relative;
 }
 .card-staced {
   padding-left: 2%;
@@ -61,4 +69,12 @@ export default {
 .blog_tags {
   margin-top: 10px;
 }
+.new_badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  margin: 5px;
+}
+
 </style>

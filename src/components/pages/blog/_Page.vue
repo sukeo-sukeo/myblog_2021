@@ -1,7 +1,8 @@
 <template>
   <div id="blogContainer">
-    <section v-for="(blog, idx) in blogs" :key="blog.uid">
-
+      
+      <section v-for="(blog, idx) in blogs" :key="blog.uid">
+      
       <title-card
         :blogData="blog"
         @title-click="toggleContent(idx)"
@@ -13,7 +14,8 @@
         v-show="isOpenContent[idx]"
       ></content-card>
     
-    </section>
+      </section>
+   
   </div>
 </template>
 
@@ -37,6 +39,7 @@ export default {
     blogs: Array,
     isOpenTitle: [],
     isOpenContent: [],
+    isOpenCarousel: false
   }),
   methods: {
     async fetchBlog() {
@@ -52,10 +55,12 @@ export default {
     toggleContent(idx) {
       if (this.isOpenContent[idx]) {
         this.contentIsOpenInit();
+        this.isOpenCarousel = false;
         return;
       } 
       this.isOpenContent.splice(idx, 1, !this.isOpenContent[idx]);
       this.isOpenTitle = this.isOpenContent;
+      this.isOpenCarousel = true;
     },
     contentIsOpenInit() {
       this.isOpenContent = Array(this.blogs.length).fill(false);
@@ -66,6 +71,7 @@ export default {
     this.fetchBlog();
   },
   mounted() {
+   
   },
   updated() {
     Prism.highlightAll();
