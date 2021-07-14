@@ -51,8 +51,14 @@ export default {
   }),
   methods: {
     async fetchBlog() {
-      const URL = "http://localhost:3030";
+      // local
+      // const URL = "http://localhost:3030";
+      
+      // product
       // const URL = 'https://sukeo.live-on.net';
+
+      console.log(process.env.VUE_APP_BASE_URL);
+      const URL = process.env.VUE_APP_BASE_URL;
       const blogs = await axios.get(`${URL}/node`).then((res) => res.data);
 
       console.log(blogs);

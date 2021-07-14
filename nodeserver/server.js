@@ -13,9 +13,16 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// local
 const filePath = `${__dirname}/blogs/`;
+const apiPath = '/node';
+// console.log(process.env.npm_config_init_version);
+// product
+// const filePath = `/var/www/html/blogs/`;
+// const apiPath = '/';
 
-app.get("/node", async (req, res) => {
+
+app.get(apiPath, async (req, res) => {
 
   const fileNames = await getFileNames(filePath);
   const fileInfos = await getFileInfos(fileNames, filePath);
@@ -49,6 +56,7 @@ const getFileInfos = async (fileNames, filePath) => {
     const infos = await fs.stat(`${filePath}/${fileName}`);
     fileInfos.push(infos);
   }
+  console.log(fileInfos);
   return fileInfos;
 };
 
@@ -107,6 +115,7 @@ const createFileData = async (names, infos, contents) => {
     data.modifidAt = infos[i].mtime;
     data.fileSize = infos[i].size;
     data.uid = infos[i].birthtimeMs;
+
     // tagの取得
     data.tag = contents[i]
       .split("\n")[0]
