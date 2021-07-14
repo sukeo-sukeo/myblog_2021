@@ -1,7 +1,10 @@
 <template>
   <section class="content">
     <div class="divider"></div>
-    <span>{{ blogData.createdAt }}</span>
+    <div class="row at_times">
+      <span class="col"><i class="tiny material-icons grey-text">text_snippet</i>{{ blogData.createdAt.split('T')[0] }}</span>
+      <span class="col"><i class="tiny material-icons grey-text">update</i>{{ blogData.modifidAt.split('T')[0] }}</span>
+    </div>
     <h3>{{ blogData.title }}</h3>
     <vue-markdown>
       {{ blogData.content }}
@@ -37,5 +40,10 @@ export default {
 }
 .content > .divider {
   margin-bottom: 10px;
+}
+.at_times {
+  margin-bottom: 5px;
+  display: flex;
+  align-items: baseline;
 }
 </style>

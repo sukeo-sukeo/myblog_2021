@@ -1,18 +1,24 @@
 <template>
   <div id="blogContainer">
       
+      <loader-circle class="loader" v-if="isLoader"></loader-circle>
+
+      <transition name="fade">
+        <div v-if="isLoader" class="mask"></div>
+      </transition>
+
       <section v-for="(blog, idx) in blogs" :key="blog.uid">
       
-      <title-card
-        :blogData="blog"
-        @title-click="toggleContent(idx)"
-        v-show="isOpenTitle[idx]"
-      ></title-card>
+        <title-card
+          :blogData="blog"
+          @title-click="toggleContent(idx)"
+          v-show="isOpenTitle[idx]"
+        ></title-card>
 
-      <content-card
-        :blogData="blog"
-        v-show="isOpenContent[idx]"
-      ></content-card>
+        <content-card
+          :blogData="blog"
+          v-show="isOpenContent[idx]"
+        ></content-card>
     
       </section>
    
@@ -23,6 +29,7 @@
 import axios from "axios";
 import TitleCard from "./Title";
 import ContentCard from "./Content";
+import LoaderCircle from "../../atoms/LoaderCircle";
 import Prism from "prismjs";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-markdown";
@@ -34,12 +41,13 @@ export default {
   components: {
     TitleCard,
     ContentCard,
+    LoaderCircle
   },
   data: () => ({
     blogs: Array,
     isOpenTitle: [],
     isOpenContent: [],
-    isOpenCarousel: false
+    isLoader: true
   }),
   methods: {
     async fetchBlog() {
@@ -55,12 +63,10 @@ export default {
     toggleContent(idx) {
       if (this.isOpenContent[idx]) {
         this.contentIsOpenInit();
-        this.isOpenCarousel = false;
         return;
       } 
       this.isOpenContent.splice(idx, 1, !this.isOpenContent[idx]);
       this.isOpenTitle = this.isOpenContent;
-      this.isOpenCarousel = true;
     },
     contentIsOpenInit() {
       this.isOpenContent = Array(this.blogs.length).fill(false);
@@ -75,9 +81,32 @@ export default {
   },
   updated() {
     Prism.highlightAll();
+    this.isLoader = false
   },
 };
 </script>
 
-<style>
+<style scoped>
+.fade-leave-active {
+  transition: opacity 1.5s;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+
+.loader {
+  position: absolute;
+  z-index: 1000;
+  /* margin: 0 auto; */
+  left: 45%;
+}
+.mask {    
+  position: absolute;
+  z-index: 100;
+  top: 300px;
+  left: 0;
+  width: 100vw;
+  height: 2000px;
+  background: white;
+}
 </style>
