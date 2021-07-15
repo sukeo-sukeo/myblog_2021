@@ -7,26 +7,28 @@
     </div>
 
     <div class="card-staced col s8">
+
       <h5>{{ blogData.title }}</h5>
-      <div class="row at_times">
-        <small class="col"><i class="tiny material-icons grey-text">text_snippet</i>{{ blogData.createdAt.split('T')[0] }}</small>
-        <small class="col"><i class="tiny material-icons grey-text">update</i>{{ blogData.modifidAt.split('T')[0] }}</small>
-      </div>
+      <at-times :blogData="blogData"></at-times>
+
       <div class="divider"></div>
-      <div class="blog_tags">
-        <small class="chip" v-for="tag in blogData.tag.split(',')" :key="tag">{{tag}}</small>
-      </div>
+      
+      <blog-tags class="blog_tags" :blogData="blogData"></blog-tags>
+
     </div>
 
   </div>
 </template>
 
 <script>
+import AtTimes from "../../atoms/AtTimes";
+import BlogTags from "../../atoms/BlogTags";
 
 export default {
   name: "TitleCard",
   components: {
-   
+    AtTimes,
+    BlogTags
   },
   data: () => ({
     newDays: 3
@@ -65,6 +67,7 @@ export default {
   /* height: 200px; */
   padding: 2%;
   cursor: pointer;
+  border-radius: 5px;
 }
 .card-image {
   width: 300px;
@@ -88,11 +91,7 @@ export default {
   z-index: 10;
   margin: 5px;
 }
-.at_times {
-  margin-bottom: 5px;
-  display: flex;
-  align-items: baseline;
-}
+
 .material-icons {
   vertical-align: bottom;
 }

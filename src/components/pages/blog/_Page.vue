@@ -15,10 +15,12 @@
           v-show="isOpenTitle[idx]"
         ></title-card>
 
-        <content-card
-          :blogData="blog"
-          v-show="isOpenContent[idx]"
-        ></content-card>
+        <transition name="fadein">
+          <content-card
+            :blogData="blog"
+            v-show="isOpenContent[idx]"
+          ></content-card>
+        </transition>
     
       </section>
    
@@ -33,8 +35,8 @@ import LoaderCircle from "../../atoms/LoaderCircle";
 import Prism from "prismjs";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-markdown";
-// import "prismjs/themes/prism.css";
-import "prismjs/themes/prism-twilight.css";
+import "prismjs/themes/prism-okaidia.css";
+// import "prismjs/themes/prism-twilight.css";
 
 export default {
   name: "BlogPage",
@@ -70,7 +72,10 @@ export default {
       if (this.isOpenContent[idx]) {
         this.contentIsOpenInit();
         return;
-      } 
+      }
+
+      scrollTo(0, 300);
+
       this.isOpenContent.splice(idx, 1, !this.isOpenContent[idx]);
       this.isOpenTitle = this.isOpenContent;
     },
@@ -99,6 +104,13 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
+.fadein-enter-active {
+  transition: opacity .5s;
+}
+.fadein-enter {
+  opacity: 0;
+}
+
 
 .loader {
   position: absolute;
