@@ -18,11 +18,6 @@ import NavBar from './components/common/NavBar';
 import FooterBar from './components/common/Footer';
 // import BlogPage from './components/pages/blog/_Page';
 
-// ブラウザバック発火時の処理
-window.addEventListener('popstate', () => {
-  router.push('/').catch(() => location.reload())
-})
-
 export default {
   name: "App",
   components: {
@@ -35,11 +30,15 @@ export default {
     
   }),
   methods: {
-    
+    browserBack() {
+      router.push('/').catch(() => location.reload())
+    }
   },
   created() {
   },
   mounted() {
+    // ブラウザバック発火時の処理
+    window.addEventListener('popstate', this.browserBack);
   },
   updated() {
   },
@@ -57,5 +56,6 @@ export default {
 <style scoped>
 .container {
   width: 90%;
+  margin-bottom: 50px;
 }
 </style>

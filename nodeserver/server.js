@@ -56,7 +56,7 @@ const getFileInfos = async (fileNames, filePath) => {
     const infos = await fs.stat(`${filePath}/${fileName}`);
     fileInfos.push(infos);
   }
-  console.log(fileInfos);
+  // console.log(fileInfos);
   return fileInfos;
 };
 
