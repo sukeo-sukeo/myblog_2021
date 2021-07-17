@@ -26,7 +26,7 @@
       </section>
 
       <transition name="fadeinout">
-        <return-top :positionX="`5%`" :positionY="`5%`" :btnColor="`red`" v-show="topReturnBtnActive"></return-top>
+        <return-top :positionX="5" :positionY="5" :btnColor="`red`" :c_Height="c_Height" :isStop="isStopBeforeFooter" v-show="topReturnBtnActive"></return-top>
       </transition>
 
   </div>
@@ -58,8 +58,12 @@ export default {
     isOpenContent: [],
     isLoader: true,
     topReturnBtnActive: false,
-    scroll: 0
+    scroll: 0,
+    isStopBeforeFooter: false,
   }),
+  props: {
+    c_Height: [Array, Object, Function],
+  },
   methods: {
     async fetchBlog() {
       // local
@@ -87,8 +91,9 @@ export default {
         return;
       }
 
-      // header+navの高さ(300)へ移動
-      scrollTo(0, 300);
+      // header+navの高さへ移動
+      const headerHeight = this.c_Height.header
+      scrollTo(0, headerHeight);
 
       // クリックされたコンテンツを開く
       const open = true
@@ -119,12 +124,25 @@ export default {
     this.fetchBlog();
   },
   mounted() {
+    // returnTopBtnの表示条件に使用
     window.addEventListener('scroll', this.scrollWindow)
   },
   updated() {
     Prism.highlightAll();
     this.isLoader = false
   },
+  watch: {
+    scroll: function(amount) {
+      // console.log(amount);
+      // console.log('見えてる高さ', window.innerHeight);
+      // console.log('全体の高さ', document.body.clientHeight);
+      if (amount + window.innerHeight + this.c_Height.footer > document.body.clientHeight) {
+        this.isStopBeforeFooter = true;
+      } else {
+        this.isStopBeforeFooter = false;
+      }
+    }
+  }
 };
 </script>
 

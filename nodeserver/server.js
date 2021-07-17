@@ -13,14 +13,19 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// local
-const filePath = `${__dirname}/blogs/`;
-const apiPath = '/node';
-// console.log(process.env.npm_config_init_version);
-// product
-// const filePath = `/var/www/html/blogs/`;
-// const apiPath = '/';
 
+let filePath = String;
+let apiPath = String;
+const USER = process.env.USER;
+if (USER === 'root') {
+  // product
+  filePath = `/var/www/html/blogs/`;
+  apiPath = '/';
+} else {
+  // local
+  filePath = `${__dirname}/blogs/`;
+  apiPath = '/node';
+}
 
 app.get(apiPath, async (req, res) => {
 
@@ -34,6 +39,9 @@ app.get(apiPath, async (req, res) => {
   
   res.json(blogData);
 });
+
+
+
 
 const sortBlog = (blogData) => {
   blogData.sort((a, b) => {
