@@ -1,5 +1,5 @@
 <template>
-  <section class="content">
+  <section class="content" :class="{content_movile: isMovileView}">
 
     <at-times :blogData="blogData"></at-times>
 
@@ -25,6 +25,7 @@ export default {
   },
   props: {
     blogData: [Object, Array],
+    isMovileView: Boolean
   },
   methods: {
   
@@ -39,6 +40,9 @@ export default {
   background: white;
   padding: 30px 50px;
   border-radius: 5px;
+}
+.content_movile {
+  padding: 30px 10px;
 }
 .content >>> img {
   width: 100%;

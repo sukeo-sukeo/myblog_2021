@@ -124,9 +124,14 @@ const createFileData = async (names, infos, contents) => {
     data.fileSize = infos[i].size;
     data.uid = infos[i].birthtimeMs;
 
+    // カテゴリの取得
+    data.category = contents[i]
+      .split("\n")[0]
+      .replace("<!--", "")
+      .replace("-->", "");
     // tagの取得
     data.tag = contents[i]
-      .split("\n")[0]
+      .split("\n")[1]
       .replace("<!--", "")
       .replace("-->", "");
 

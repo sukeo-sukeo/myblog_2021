@@ -3,7 +3,7 @@
     <div class="container">
       <div class="row sns_icons">
         <div 
-        class="col hoverable"
+        class="col"
         v-for="icon in iconNames" :key="icon.url"
         >
           <icon-btn

@@ -1,3 +1,4 @@
+<!-- 雑記 -->
 <!-- os, linux, centos -->
 ![](img/cafe.jpg)
 ***

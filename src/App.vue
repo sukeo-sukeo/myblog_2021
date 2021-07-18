@@ -3,8 +3,10 @@
     <header-bar ref="header"></header-bar>
     <nav-bar ref="navbar"></nav-bar>
 
-    <article class="container">
-      <router-view :c_Height="componentsHeight" />
+    <article :class="{container: !isMovileView}">
+      <router-view 
+      :isMovileView="isMovileView"
+      :c_Height="componentsHeight" />
     </article>
 
     <footer-bar ref="footer"></footer-bar>
@@ -27,7 +29,9 @@ export default {
     FooterBar
   },
   data: () => ({
-    componentsHeight: Object
+    componentsHeight: Object,
+    resize: 0,
+    isMovileView: false 
   }),
   methods: {
     browserBack() {
@@ -39,7 +43,6 @@ export default {
         const key = Object.entries(ref)[0][0];
         const dom = Object.entries(ref)[0][1];
         clientHeightObj[key] = dom.clientHeight
-        // clientsHeight.push({[key]: dom.clientHeight})
       }
       return clientHeightObj;
     },
@@ -49,7 +52,10 @@ export default {
         doms.push({[key]: refs[key].$el})
       }
       return doms;
-    }
+    },
+    mediaQuery() {
+      this.resize = window.innerWidth;
+    },
   },
   created() {
   },
@@ -57,25 +63,26 @@ export default {
     // ブラウザバック発火時の処理
     window.addEventListener('popstate', this.browserBack);
 
+    // モバイルビューの表示条件に使用
+    this.resize = window.innerWidth;
+    console.log(this.resize);
+    window.addEventListener('resize', this.mediaQuery)
+
     // 各コンポーネントのheightを取得
     const refs = this.getCompornents(this.$refs)
-    // const refsHeight = JSON.stringify(this.getClientsHeight(refs));
     this.componentsHeight = this.getClientsHeight(refs);
-    // console.log(refsHeight);
-    // this.componentsHeight = refsHeight;
-    console.log(this.componentsHeight);
-    
-    // console.log(JSON.stringify(this.componentsHeight));
+  
   },
   updated() {
   },
   watch: {
-    // '$route': (to, from) => {
-    //   console.log('遷移前のページ:', from);
-    //   console.log('遷移後のページ:', to);
-    //   // console.log(this.$route.path);
-    //   // router.push('/').catch(() => location.reload())
-    // }
+    resize: function(amount) {
+      if (amount <= 600) {
+        this.isMovileView = true
+      } else {
+        this.isMovileView = false
+      }
+    }
   }
 };
 </script>

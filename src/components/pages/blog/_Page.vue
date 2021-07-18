@@ -8,10 +8,11 @@
       </transition>
 
       <section v-for="(blog, idx) in blogs" :key="blog.uid">
-      
+              
         <title-card
           ref="title"
           :blogData="blog"
+          :isMovileView="isMovileView"
           @title-click="toggleContent(idx)"
           v-show="isOpenTitle[idx]"
         ></title-card>
@@ -19,6 +20,7 @@
         <transition name="fadein">
           <content-card
             :blogData="blog"
+            :isMovileView="isMovileView"
             v-show="isOpenContent[idx]"
           ></content-card>
         </transition>
@@ -53,6 +55,7 @@ export default {
     ReturnTop
   },
   data: () => ({
+    baseURL: String,
     blogs: Array,
     isOpenTitle: [],
     isOpenContent: [],
@@ -60,38 +63,46 @@ export default {
     topReturnBtnActive: false,
     scroll: 0,
     isStopBeforeFooter: false,
+    totalTitleHeight: 0
   }),
   props: {
     c_Height: [Array, Object, Function],
+    isMovileView: Boolean
   },
   methods: {
     async fetchBlog() {
-      // local
-      // const URL = "http://localhost:3030";
-      
-      // product
-      // const URL = 'https://sukeo.live-on.net';
+      const blogs = await axios.get(`${this.baseURL}/node`).then((res) => res.data);
 
-      console.log(process.env.VUE_APP_BASE_URL);
-      const URL = process.env.VUE_APP_BASE_URL;
-      const blogs = await axios.get(`${URL}/node`).then((res) => res.data);
-
-      console.log(blogs);
+      // console.log(blogs);
       this.blogs = blogs;
 
       //コンテンツの開閉状態を初期化
       this.contentIsOpenInit();
     },
+    culcTotalHight(refs, limit) {
+      let totalHeight = 0;
+      for (let i = 0; i <= limit; i++) {
+        totalHeight += refs[i].$el.clientHeight;
+      }
+      return totalHeight;
+    },
     toggleContent(idx) {
+      
+      // タイトル一覧画面(コンテンツが閉じているとき)でクリックしたタイトル要素までのheightを保存
+      if (!this.isOpenContent[idx]) {
+        const titleDOM = this.$refs.title;
+        this.totalTitleHeight = this.culcTotalHight(titleDOM, idx)
+      }
+
+      // コンテンツを閉じる処理 
+      // タイトル一覧へ戻った時の位置の調整
       if (this.isOpenContent[idx]) { 
         this.contentIsOpenInit();
-        const titleDOM = this.$refs.title[idx].$el;
-        const adjust_Y = 20;
-        this.scrollAdjust(titleDOM, adjust_Y);
+        this.adjustScroll();
         return;
       }
 
-      // header+navの高さへ移動
+      // ブラウザのトップへ移動
       const headerHeight = this.c_Height.header
       scrollTo(0, headerHeight);
 
@@ -108,7 +119,7 @@ export default {
       this.isOpenTitle = fillTrue
     },
     scrollWindow() {
-      const top = 500 // ボタンを表示させたい位置
+      const top = 500 // retrunTopボタンを表示させたい位置
       this.scroll = window.scrollY
       if (top <= this.scroll) {
         this.topReturnBtnActive = true
@@ -116,11 +127,24 @@ export default {
         this.topReturnBtnActive = false
       }
     },
-    scrollAdjust(dom, adjust = 0) {
-      scrollTo(0, dom.offsetTop - adjust);
+    adjustScroll() {
+      const adjust_Y = 100;
+      scrollTo({
+        top: this.totalTitleHeight + adjust_Y,
+        behavior: 'smooth'
+      })
+    },
+    judgeBaseURL() {
+      if (location.href.includes('localhost') ||
+          location.href.includes('192')) {
+        this.baseURL = "http://localhost:3030"
+      } else {
+        this.baseURL = "https://sukeo.live-on.net";
+      }
     }
   },
   created() {
+    this.judgeBaseURL();
     this.fetchBlog();
   },
   mounted() {
@@ -133,9 +157,6 @@ export default {
   },
   watch: {
     scroll: function(amount) {
-      // console.log(amount);
-      // console.log('見えてる高さ', window.innerHeight);
-      // console.log('全体の高さ', document.body.clientHeight);
       if (amount + window.innerHeight + this.c_Height.footer > document.body.clientHeight) {
         this.isStopBeforeFooter = true;
       } else {

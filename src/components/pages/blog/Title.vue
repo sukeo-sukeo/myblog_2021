@@ -1,21 +1,26 @@
 <template>
-  <div class="card hoverable horizontal row" @click="$emit('title-click')">
+  <div class="card hoverable row" :class="{horizontal: !isMovileView}" @click="$emit('title-click')">
+    
 
-    <div class="card-image col s4">
+    <div class="card-image col s12 m4">
       <img class="responsive-img" :src="`data:image/png;base64,${blogData.thumImg}`">
       <span v-show="judgeNewContent()" class="new badge pulse red new_badge"></span>
+      <span class="badge grey white-text  category_badge">
+        {{ blogData.category }}
+      </span>
     </div>
 
-    <div class="card-staced col s8">
 
+    <div class="card-staced col s12 m8">
       <h5>{{ blogData.title }}</h5>
       <at-times :blogData="blogData"></at-times>
 
       <div class="divider"></div>
       
       <blog-tags class="blog_tags" :blogData="blogData"></blog-tags>
-
     </div>
+
+    
 
   </div>
 </template>
@@ -35,6 +40,7 @@ export default {
   }),
   props: {
     blogData: [Object, Array],
+    isMovileView: Boolean
   },
   computed: {
   },
@@ -59,6 +65,11 @@ export default {
   updated() {
     
   },
+  watch: {
+    isMovileView: function(data) {
+      console.log(data);
+    }
+  } 
 };
 </script>
 
@@ -91,14 +102,16 @@ export default {
   z-index: 10;
   margin: 5px;
 }
+.category_badge {
+  position: absolute;
+  top: 0;
+  left: 10px;
+  z-index: 10;
+  margin: 5px;
+}
 
 .material-icons {
   vertical-align: bottom;
 }
-/* .at_times > small:first-child {
-  flex: 1;
-}
-.at_times > small:nth-child(2) {
-  text-align: end;
-} */
+
 </style>

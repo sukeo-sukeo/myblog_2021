@@ -1,0 +1,16 @@
+<div class="card-image col s4">
+      <img class="responsive-img" :src="`data:image/png;base64,${blogData.thumImg}`">
+      <span v-show="judgeNewContent()" class="new badge pulse red new_badge"></span>
+      <span class="badge grey white-text  category_badge">
+        {{ blogData.category }}
+      </span>
+    </div>
+
+    <div class="card-staced col s8">
+      <h5>{{ blogData.title }}</h5>
+      <at-times :blogData="blogData"></at-times>
+
+      <div class="divider"></div>
+      
+      <blog-tags class="blog_tags" :blogData="blogData"></blog-tags>
+    </div>
