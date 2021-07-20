@@ -8,6 +8,7 @@
     <vue-markdown class="markdown">
       {{ blogData.content }}
     </vue-markdown>
+    
   </section>
 </template>
 
@@ -40,9 +41,11 @@ export default {
   background: white;
   padding: 30px 50px;
   border-radius: 5px;
+  line-height: 1.8;
 }
 .content_movile {
   padding: 30px 10px;
+  padding-bottom: 100px;
 }
 .content >>> img {
   width: 100%;

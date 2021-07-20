@@ -1,6 +1,17 @@
 <template>
   <header class="valign-wrapper">
-    <h2 @click="goToHome">スケオブログ</h2>
+    <div class="row">
+      <h1 class="site_title col s12 valign-wrapper" @click="goToHome">
+        <i class="material-icons">
+          laptop_mac
+        </i>
+        スケオブログ
+        <i class="material-icons">
+          code_off
+        </i>
+      </h1>
+      <h5 class="site_title sub_title col s12">実務未経験エンジニアによる<br class="hide-on-med-and-up"/>実務未経験エンジニアのためのブログ</h5>
+    </div>
   </header>
 </template>
 
@@ -24,8 +35,21 @@ header {
   background-size: cover;
   cursor: pointer;
 }
-h2 {
-  margin: 0 auto;
-  font-family: Georgia, 'Times New Roman', Times, serif;
+.site_title {
+  font-size: 36px;
+  letter-spacing: 3px;
+  justify-content: center;
+  font-family: 'Train One', cursive;
+  text-shadow: 5px 5px 10px white;
+  margin-bottom: 0;
 }
+.sub_title {
+  font-size: 20px;
+  padding: 0 20px;
+  text-align: center;
+}
+.material-icons {
+  font-size: 42px;
+}
+
 </style>

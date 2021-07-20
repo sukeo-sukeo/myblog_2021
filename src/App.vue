@@ -1,12 +1,15 @@
 <template>
   <div class="">
     <header-bar ref="header"></header-bar>
-    <nav-bar ref="navbar"></nav-bar>
+    <nav-bar ref="navbar" :routeData="routeData"></nav-bar>
 
     <article :class="{container: !isMovileView}">
       <router-view 
       :isMovileView="isMovileView"
-      :c_Height="componentsHeight" />
+      :topReturnBtnActive="topReturnBtnActive"
+      :isStopBeforeFooter="isStopBeforeFooter"
+      :routeData="routeData"
+      :c_Height="c_Height" />
     </article>
 
     <footer-bar ref="footer"></footer-bar>
@@ -29,9 +32,15 @@ export default {
     FooterBar
   },
   data: () => ({
-    componentsHeight: Object,
+    c_Height: Object,
     resize: 0,
-    isMovileView: false 
+    scroll: 0,
+    topBtnShowHeight: 700,
+    topReturnBtnActive: false,
+    isStopBeforeFooter: false,
+    movileViewMinWidth: 600,
+    isMovileView: false,
+    routeData: Array
   }),
   methods: {
     browserBack() {
@@ -56,33 +65,60 @@ export default {
     mediaQuery() {
       this.resize = window.innerWidth;
     },
-  },
-  created() {
-  },
-  mounted() {
-    // ブラウザバック発火時の処理
-    window.addEventListener('popstate', this.browserBack);
-
-    // モバイルビューの表示条件に使用
-    this.resize = window.innerWidth;
-    console.log(this.resize);
-    window.addEventListener('resize', this.mediaQuery)
-
-    // 各コンポーネントのheightを取得
-    const refs = this.getCompornents(this.$refs)
-    this.componentsHeight = this.getClientsHeight(refs);
-  
-  },
-  updated() {
-  },
-  watch: {
-    resize: function(amount) {
-      if (amount <= 600) {
+    scrollWindow() {
+      this.scroll = window.scrollY
+    },
+    judgeShowTopBtn(amount) {
+      if (this.topBtnShowHeight <= amount) {
+        this.topReturnBtnActive = true
+      } else {
+        this.topReturnBtnActive = false
+      }  
+    },
+    judgeStopTopBtn(amount) {
+      if (amount + window.innerHeight + this.c_Height.footer > document.body.clientHeight) {
+        this.isStopBeforeFooter = true;
+      } else {
+        this.isStopBeforeFooter = false;
+      }
+    },
+    judgeIsMovile(amount) {
+      if (amount <= this.movileViewMinWidth) {
         this.isMovileView = true
       } else {
         this.isMovileView = false
       }
     }
+  },
+  created() {
+    // ルートpathを取得
+    this.routeData = this.$router.options.routes.slice(0, -1)
+  },
+  mounted() {
+    // ブラウザバック時の処理
+    window.addEventListener('popstate', this.browserBack);
+
+    // モバイルビューの表示条件
+    this.resize = window.innerWidth;
+    window.addEventListener('resize', this.mediaQuery)
+
+    // btnの表示条件など
+    window.addEventListener('scroll', this.scrollWindow)
+
+    // 各コンポーネントのheightを取得
+    const refs = this.getCompornents(this.$refs)
+    this.c_Height = this.getClientsHeight(refs);
+  },
+  updated() {
+  },
+  watch: {
+    resize: function(amount) {
+      this.judgeIsMovile(amount);
+    },
+    scroll: function(amount) {
+      this.judgeShowTopBtn(amount);
+      this.judgeStopTopBtn(amount);
+    },
   }
 };
 </script>

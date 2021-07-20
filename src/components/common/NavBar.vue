@@ -15,14 +15,12 @@
 
 <script>
 export default {
-    name: 'NavBar',
-    data: () => ({
-      routeData: Array
-    }),
-    mounted() {
-      this.routeData = this.$router.options.routes.slice(0, -1)
-    }
-
+  name: 'NavBar',
+  props: {
+    routeData: Array
+  },
+  mounted() {
+  }
 }
 </script>
 

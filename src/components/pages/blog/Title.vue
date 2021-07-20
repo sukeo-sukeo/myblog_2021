@@ -1,4 +1,5 @@
 <template>
+  
   <div class="card hoverable row" :class="{horizontal: !isMovileView}" @click="$emit('title-click')">
     
 
@@ -65,11 +66,6 @@ export default {
   updated() {
     
   },
-  watch: {
-    isMovileView: function(data) {
-      console.log(data);
-    }
-  } 
 };
 </script>
 

@@ -1,7 +1,7 @@
 <template>
   <div class="row at_times">
     <span class="col"><i class="tiny material-icons grey-text">text_snippet</i>{{ blogData.createdAt.split('T')[0] }}に公開</span>
-    <span class="col"><i class="tiny material-icons grey-text">update</i>{{ blogData.modifidAt.split('T')[0] }}に更新されています</span>
+    <span class="col"><i class="tiny material-icons grey-text">update</i>{{ blogData.modifidAt.split('T')[0] }}に更新</span>
   </div>
 </template>
 

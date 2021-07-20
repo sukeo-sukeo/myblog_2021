@@ -8,13 +8,18 @@
       </transition>
 
       <section v-for="(blog, idx) in blogs" :key="blog.uid">
-              
+
+        <bread-crumbs v-show="isOpenContent[idx]"
+        @title-click="toggleContent(idx)"
+        :isMovileView="isMovileView"
+        :breads="createBreadData(blog)"></bread-crumbs>
+  
         <title-card
           ref="title"
           :blogData="blog"
           :isMovileView="isMovileView"
           @title-click="toggleContent(idx)"
-          v-show="isOpenTitle[idx]"
+          v-show="showTitle"
         ></title-card>
 
         <transition name="fadein">
@@ -24,11 +29,30 @@
             v-show="isOpenContent[idx]"
           ></content-card>
         </transition>
-    
+  
+        
       </section>
+      
+      <transition name="fadeinout">
+        <any-btn
+        @title-click="toggleContent(idx)"
+        :btnIcon="`first_page`"
+        :btnSize="`btn-small`"
+        :event="`backView`"
+        :positionX="90" 
+        :positionY="93" 
+        :btnColor="`grey lighten-1`" :c_Height="c_Height" :isStop="isStopBeforeFooter" 
+        v-if="isOpenContent[idx]"
+        v-show="topReturnBtnActive"></any-btn>
+      </transition>
 
       <transition name="fadeinout">
-        <return-top :positionX="5" :positionY="5" :btnColor="`red`" :c_Height="c_Height" :isStop="isStopBeforeFooter" v-show="topReturnBtnActive"></return-top>
+        <any-btn 
+        :btnIcon="`arrow_upward`"
+        :event="`returnTop`"
+        :positionX="5" 
+        :positionY="5" 
+        :btnColor="`red`" :c_Height="c_Height" :isStop="isStopBeforeFooter" v-show="topReturnBtnActive"></any-btn>
       </transition>
 
   </div>
@@ -38,8 +62,9 @@
 import axios from "axios";
 import TitleCard from "./Title";
 import ContentCard from "./Content";
+import BreadCrumbs from "../../common/BreadCrumbs";
 import LoaderCircle from "../../atoms/LoaderCircle";
-import ReturnTop from "../../atoms/ReturnTop";
+import AnyBtn from "../../atoms/AnyBtn";
 import Prism from "prismjs";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-markdown";
@@ -52,22 +77,25 @@ export default {
     TitleCard,
     ContentCard,
     LoaderCircle,
-    ReturnTop
+    AnyBtn,
+    BreadCrumbs
   },
   data: () => ({
     baseURL: String,
     blogs: Array,
-    isOpenTitle: [],
+    // isOpenTitle: [],
     isOpenContent: [],
+    showTitle: true,
     isLoader: true,
-    topReturnBtnActive: false,
-    scroll: 0,
-    isStopBeforeFooter: false,
-    totalTitleHeight: 0
+    totalTitleHeight: 0,
+    idx: Number
   }),
   props: {
     c_Height: [Array, Object, Function],
-    isMovileView: Boolean
+    isMovileView: Boolean,
+    topReturnBtnActive: Boolean,
+    isStopBeforeFooter: Boolean,
+    routeData: Array
   },
   methods: {
     async fetchBlog() {
@@ -87,48 +115,44 @@ export default {
       return totalHeight;
     },
     toggleContent(idx) {
-      
-      // タイトル一覧画面(コンテンツが閉じているとき)でクリックしたタイトル要素までのheightを保存
+      this.idx = idx;
+      // topからタイトル要素までのheightを保存
       if (!this.isOpenContent[idx]) {
         const titleDOM = this.$refs.title;
         this.totalTitleHeight = this.culcTotalHight(titleDOM, idx)
       }
 
-      // コンテンツを閉じる処理 
-      // タイトル一覧へ戻った時の位置の調整
-      if (this.isOpenContent[idx]) { 
-        this.contentIsOpenInit();
-        this.adjustScroll();
+      // コンテンツを閉じる処理
+      if (this.isOpenContent[idx]) {
+        this.closeContent();
         return;
       }
 
-      // ブラウザのトップへ移動
+      // ヘッダーの下へ移動
       const headerHeight = this.c_Height.header
       scrollTo(0, headerHeight);
 
       // クリックされたコンテンツを開く
       const open = true
       this.isOpenContent.splice(idx, 1, open);
-      this.isOpenTitle = this.isOpenContent;
+      this.showTitle = false;
+      // this.isOpenTitle = this.isOpenContent;
     },
     contentIsOpenInit() {
       const fillFlase = Array(this.blogs.length).fill(false);
-      const fillTrue = Array(this.blogs.length).fill(true);
+      // const fillTrue = Array(this.blogs.length).fill(true);
 
       this.isOpenContent = fillFlase;
-      this.isOpenTitle = fillTrue
+      this.showTitle = true;
+      // this.isOpenTitle = fillTrue
     },
-    scrollWindow() {
-      const top = 500 // retrunTopボタンを表示させたい位置
-      this.scroll = window.scrollY
-      if (top <= this.scroll) {
-        this.topReturnBtnActive = true
-      } else {
-        this.topReturnBtnActive = false
-      }
+    closeContent() {
+      // 戻った時の位置の調整
+      this.adjustScroll();
+      this.contentIsOpenInit();
     },
     adjustScroll() {
-      const adjust_Y = 100;
+      const adjust_Y = 150;
       scrollTo({
         top: this.totalTitleHeight + adjust_Y,
         behavior: 'smooth'
@@ -141,6 +165,14 @@ export default {
       } else {
         this.baseURL = "https://sukeo.live-on.net";
       }
+    },
+    createBreadData(blog) {
+      return {
+        root: 'HOME',
+        sub: this.routeData[0].name.toUpperCase(),
+        category: blog.category,
+        title: blog.title.length >= 30? blog.title.slice(0,30) + "..." : blog.title
+      }
     }
   },
   created() {
@@ -148,21 +180,13 @@ export default {
     this.fetchBlog();
   },
   mounted() {
-    // returnTopBtnの表示条件に使用
-    window.addEventListener('scroll', this.scrollWindow)
+    // 'HOME', this.routeData[0].name.toUpperCase(), blog.category , blog.title]
   },
   updated() {
     Prism.highlightAll();
     this.isLoader = false
   },
   watch: {
-    scroll: function(amount) {
-      if (amount + window.innerHeight + this.c_Height.footer > document.body.clientHeight) {
-        this.isStopBeforeFooter = true;
-      } else {
-        this.isStopBeforeFooter = false;
-      }
-    }
   }
 };
 </script>
@@ -208,4 +232,5 @@ export default {
   height: 2000px;
   background: white;
 }
+
 </style>
