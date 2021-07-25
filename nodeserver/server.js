@@ -2,8 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const path = require("path");
-
 const fs = require("fs").promises;
+const Twitter = require("twitter-v2");
+const fetch = require("node-fetch");
+
+require('dotenv').config();
 
 const port = process.env.port || process.env.PORT || 3030;
 
@@ -13,22 +16,21 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
 let filePath = String;
 let apiPath = String;
 const USER = process.env.USER;
 if (USER === 'root') {
   // product
-  filePath = `/var/www/html/blogs/`;
+  filePath = `/var/www/html/blogs`;
   apiPath = '/';
 } else {
   // local
   filePath = `${__dirname}/blogs/`;
-  apiPath = '/node';
+  apiPath = '/node/';
 }
 
+// ブログデータを取得
 app.get(apiPath, async (req, res) => {
-
   const fileNames = await getFileNames(filePath);
   const fileInfos = await getFileInfos(fileNames, filePath);
   const contents = await getContents(fileNames, filePath);
@@ -39,6 +41,68 @@ app.get(apiPath, async (req, res) => {
   
   res.json(blogData);
 });
+
+// githubからレポジトリ情報を取得
+app.get(apiPath + 'product', async (req, res) => {
+  const GITHUB_API_URL = "https://api.github.com";
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const USERNAME = "sukeo-sukeo";
+
+  const results = await fetch(`${GITHUB_API_URL}/users/${USERNAME}/repos`, {
+    headers: {
+      authorization: `token ${GITHUB_TOKEN}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      return data;
+    });
+
+  let dataList = [];
+  for (const result of results) {
+    if (!result.private && result.homepage) {
+      const data = {};
+      data.name = result.name;
+      data.url = result.html_url;
+      data.siteUrl = result.homepage;
+      data.description = result.description;
+      data.updatedAt = result.updated_at;
+      data.watchers = result.watchers;
+      data.watchers_c = result.watchers_count;
+      dataList.push(data);
+    }
+  }
+
+  dataList.sort((a, b) => {
+    if (a.updatedAt > b.updatedAt) {
+      return -1;
+    } else {
+      return 1;
+    }
+  });
+
+  res.json(dataList);
+});
+
+// twitterから情報を取得
+app.get(apiPath + 'profile', async (req, res) => {
+  const client = new Twitter({
+    consumer_key: process.env.TWITTER_APIKEY,
+    consumer_secret: process.env.TWITTER_SECRET_KEY,
+    access_token_key: process.env.TWITTER_ACCESS_TOKEN,
+    access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
+  });
+  const userId = process.env.TWITTER_USERID;
+  const params = {
+    "user.fields": "description,profile_image_url",
+  };
+
+  const { data } = await client.get(`users/${userId}`, params);
+  const imgSize = "_200x200";
+  data.profile_image_url = data.profile_image_url.replace('_normal', imgSize);
+  res.json({twitterProfile: data});
+});
+
 
 
 
@@ -86,7 +150,7 @@ const getImgPaths = (content) => {
 const getImg = async (imgPaths) => {
   let imgs = [];
   for (imgPath of imgPaths) {
-    const img = await fs.readFile(`${filePath}/${imgPath}`, { encoding: 'base64'});
+    const img = await fs.readFile(`${filePath}/${imgPath}`, { encoding: 'base64' });
     imgs.push(img);
   }
   return imgs;

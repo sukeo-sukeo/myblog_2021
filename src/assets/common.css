@@ -1,0 +1,39 @@
+/* fadeoutのみ */
+.fade-leave-active {
+  transition: opacity 1.5s;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* fadeinのみ */
+.fadein-enter-active {
+  transition: opacity .5s;
+}
+.fadein-enter {
+  opacity: 0;
+}
+
+/* fadeinしてfadeout */
+.fadeinout-enter-active, .fadeinout-leave-active {
+  transition: opacity 1s;
+}
+.fadeinout-enter, .fadeinout-leave-to {
+  opacity: 0;
+}
+
+.loader {
+  position: absolute;
+  z-index: 1000;
+  /* margin: 0 auto; */
+  left: 45%;
+}
+.mask {    
+  position: absolute;
+  z-index: 100;
+  top: 300px;
+  left: 0;
+  width: 100vw;
+  height: 2000px;
+  background: white;
+}

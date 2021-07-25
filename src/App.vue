@@ -5,6 +5,7 @@
 
     <article :class="{container: !isMovileView}">
       <router-view 
+      :baseURL="baseURL"
       :isMovileView="isMovileView"
       :topReturnBtnActive="topReturnBtnActive"
       :isStopBeforeFooter="isStopBeforeFooter"
@@ -40,7 +41,8 @@ export default {
     isStopBeforeFooter: false,
     movileViewMinWidth: 600,
     isMovileView: false,
-    routeData: Array
+    routeData: Array,
+    baseURL: String
   }),
   methods: {
     browserBack() {
@@ -88,11 +90,40 @@ export default {
       } else {
         this.isMovileView = false
       }
-    }
+    },
+    judgeBaseURL() {
+      if (location.href.includes('localhost') ||
+          location.href.includes('192')) {
+        this.baseURL = "http://localhost:3030"
+      } else {
+        this.baseURL = "https://sukeo.live-on.net";
+      }
+    },
+    loadTwitterWidets() {
+       window.twttr = (((d, s, id) => {
+        let js, fjs = d.getElementsByTagName(s)[0],
+          t = window.twttr || {};
+        if (d.getElementById(id)) return t;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://platform.twitter.com/widgets.js";
+        fjs.parentNode.insertBefore(js, fjs);
+
+        t._e = [];
+        t.ready = function(f) {
+          t._e.push(f);
+        };
+        return t;
+      })(document, "script", "twitter-wjs"));
+    },
   },
   created() {
+    // localか本番か判断
+    this.judgeBaseURL();
     // ルートpathを取得
-    this.routeData = this.$router.options.routes.slice(0, -1)
+    this.routeData = this.$router.options.routes.slice(0, -1);
+    // ツイッターウィジェットをロード
+    this.loadTwitterWidets();
   },
   mounted() {
     // ブラウザバック時の処理

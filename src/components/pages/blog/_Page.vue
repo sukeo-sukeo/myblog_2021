@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import TitleCard from "./Title";
 import ContentCard from "./Content";
 import BreadCrumbs from "../../common/BreadCrumbs";
@@ -81,7 +80,6 @@ export default {
     BreadCrumbs
   },
   data: () => ({
-    baseURL: String,
     blogs: Array,
     // isOpenTitle: [],
     isOpenContent: [],
@@ -95,11 +93,12 @@ export default {
     isMovileView: Boolean,
     topReturnBtnActive: Boolean,
     isStopBeforeFooter: Boolean,
-    routeData: Array
+    routeData: Array,
+    baseURL: String,
   },
   methods: {
     async fetchBlog() {
-      const blogs = await axios.get(`${this.baseURL}/node`).then((res) => res.data);
+      const blogs = await this.$axios.get(`${this.baseURL}/node`).then((res) => res.data);
 
       // console.log(blogs);
       this.blogs = blogs;
@@ -158,14 +157,6 @@ export default {
         behavior: 'smooth'
       })
     },
-    judgeBaseURL() {
-      if (location.href.includes('localhost') ||
-          location.href.includes('192')) {
-        this.baseURL = "http://localhost:3030"
-      } else {
-        this.baseURL = "https://sukeo.live-on.net";
-      }
-    },
     createBreadData(blog) {
       return {
         root: 'HOME',
@@ -176,7 +167,6 @@ export default {
     }
   },
   created() {
-    this.judgeBaseURL();
     this.fetchBlog();
   },
   mounted() {
@@ -184,7 +174,7 @@ export default {
   },
   updated() {
     Prism.highlightAll();
-    this.isLoader = false
+    this.isLoader = false;
   },
   watch: {
   }
@@ -192,45 +182,6 @@ export default {
 </script>
 
 <style scoped>
-/* fadeoutのみ */
-.fade-leave-active {
-  transition: opacity 1.5s;
-}
-.fade-leave-to {
-  opacity: 0;
-}
 
-/* fadeinのみ */
-.fadein-enter-active {
-  transition: opacity .5s;
-}
-.fadein-enter {
-  opacity: 0;
-}
-
-/* fadeinしてfadeout */
-.fadeinout-enter-active, .fadeinout-leave-active {
-  transition: opacity 1s;
-}
-.fadeinout-enter, .fadeinout-leave-to {
-  opacity: 0;
-}
-
-
-.loader {
-  position: absolute;
-  z-index: 1000;
-  /* margin: 0 auto; */
-  left: 45%;
-}
-.mask {    
-  position: absolute;
-  z-index: 100;
-  top: 300px;
-  left: 0;
-  width: 100vw;
-  height: 2000px;
-  background: white;
-}
 
 </style>

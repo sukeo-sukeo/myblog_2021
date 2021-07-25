@@ -1,12 +1,20 @@
 <template>
-  <button :style="isStop? btnStyle.fixed : btnStyle.nomal" class="btn-floating btn-large waves-effect waves-light" :class="[btnColor, {[btnSize]: !isStop}]" @click="btnEvent">
-    <i class="material-icons">{{ btnIcon }}</i>
+  <button :style="isStop? btnStyle.fixed : btnStyle.nomal" :class="[btnClass, btnColor, {[btnSize]: !isStop}]" @click="btnEvent">
+    <template v-if="event === 'followBtn'">
+      <span v-html="btnIcon"></span>
+    </template>
+    <template v-else>
+      <i class="material-icons">{{ btnIcon }}</i>
+    </template>
   </button>
 </template>
 
 <script>
 export default {
   name: 'AnyBtn',
+  data: () => ({
+    btnClass:  "btn-floating btn-large waves-effect waves-light",
+  }),
   props: {
     btnIcon: String,
     btnSize: String,
@@ -47,7 +55,9 @@ export default {
     },
   },
   mounted() {
-    console.log(this.isStop);
+    if (this.event === "followBtn") {
+      this.btnClass = "";
+    }
   }
 }
 </script>
