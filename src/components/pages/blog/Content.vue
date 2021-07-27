@@ -58,19 +58,33 @@ export default {
   margin-bottom: 10px;
 }
 /* md→html パース後のブログ記事へのCSS */
-.markdown >>> p {
-  font-size: 16px;
-}
+/* .markdown >>> p {
+  font-size: 18px;
+} */
 .markdown >>> a {
   text-decoration: underline;
   color: #0000EE
 }
+.markdown >>> li {
+  list-style: inside;
+  /* font-size: 18px; */
+}
 .markdown >>> h1 {
+  margin-top: 100px;
+  font-size: 36px;
+  font-weight: bold;
+  filter: drop-shadow(2px 4px 6px wheat);
+}
+.markdown >>> h2 {
   font-size: 24px;
   font-weight: bold;
 }
+.markdown >>> h3 {
+  font-size: 20px;
+  font-weight: bold;
+}
 .markdown >>> blockquote {
-  color: gray;
+  color: rgb(167, 161, 161);
 }
 .markdown >>> code:not(pre > code) {
   background-color: lightgray;

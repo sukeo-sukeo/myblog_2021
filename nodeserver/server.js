@@ -59,7 +59,7 @@ app.get(apiPath + 'product', async (req, res) => {
     });
 
   let dataList = [];
-  for (const result of results) {
+  for (result of results) {
     if (!result.private && result.homepage) {
       const data = {};
       data.name = result.name;
@@ -119,6 +119,7 @@ const sortBlog = (blogData) => {
 
 const getFileNames = async (filePath) => {
   const fileNames = await fs.readdir(filePath);
+  // ディレクトリを作成した場合はここでの処理を検討
   return fileNames.filter((name) => path.extname(name) === ".md");
 };
 
@@ -126,9 +127,26 @@ const getFileInfos = async (fileNames, filePath) => {
   let fileInfos = [];
   for (fileName of fileNames) {
     const infos = await fs.stat(`${filePath}/${fileName}`);
+    // 日本時間に修正(UTC時間で現在の日本時間から9時間マイナスで表示される)
+    infos.mtime = infos.mtime
+      .toLocaleString({ timeZone: "Asia/Tokyo" })
+      .split(" ")[0]
+      .replace("/", "-")
+      .replace("/", "-");
+    
+    // 月、日に0をつける処理
+    const y = infos.mtime.split("-")[0]; 
+    const m = infos.mtime.split("-")[1]; 
+    const d = infos.mtime.split("-")[2]; 
+    if (m.length === 1) {
+      infos.mtime = `${y}-0${m}-${d}`;
+    }
+    if (d.length === 1) {
+      infos.mtime = `${y}-${m}-0${d}`;
+    }
+
     fileInfos.push(infos);
   }
-  // console.log(fileInfos);
   return fileInfos;
 };
 
@@ -173,29 +191,35 @@ const replaceImgPath = (content, paths, base64_imgData) => {
   return newContent;
 }
 
-const createTextConvertedImgToBase64 = () => {
-  return convertedText;
-}
-
 const createFileData = async (names, infos, contents) => {
   const fileData = [];
 
   for (i in names) {
     const data = {};
+
     data.title = names[i].replace(path.extname(names[i]), "");
-    data.createdAt = infos[i].birthtime;
     data.modifidAt = infos[i].mtime;
     data.fileSize = infos[i].size;
-    data.uid = infos[i].birthtimeMs;
 
-    // カテゴリの取得
-    data.category = contents[i]
+    // 作成日の取得
+    data.createdAt = contents[i]
       .split("\n")[0]
       .replace("<!--", "")
       .replace("-->", "");
+    // 作成日をミリ秒に変換しuidとする
+    data.uid = Date.parse(data.createdAt);
+    // 日付部分だけを取り出す
+    data.createdAt = data.createdAt.split(" ")[1];
+
+    // カテゴリの取得
+    data.category = contents[i]
+      .split("\n")[1]
+      .replace("<!--", "")
+      .replace("-->", "");
+    
     // tagの取得
     data.tag = contents[i]
-      .split("\n")[1]
+      .split("\n")[2]
       .replace("<!--", "")
       .replace("-->", "");
 

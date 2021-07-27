@@ -40,7 +40,7 @@ header {
   letter-spacing: 3px;
   justify-content: center;
   font-family: 'Train One', cursive;
-  text-shadow: 5px 5px 10px white;
+  text-shadow: 2px 2px 1px white, 3px 3px 8px wheat;
   margin-bottom: 0;
 }
 .sub_title {

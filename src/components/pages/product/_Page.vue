@@ -7,9 +7,9 @@
       <div v-if="isLoader" class="mask"></div>
     </transition>
 
-    <div v-for="repo in repos" :key="repo.url">
+    <section v-for="repo in repos" :key="repo.url">
       <repo-card :repoData="repo"></repo-card>
-    </div>
+    </section>
   </div>
 </template>
 
