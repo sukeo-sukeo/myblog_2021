@@ -10,7 +10,8 @@
           code_off
         </i>
       </h1>
-      <h5 class="site_title sub_title col s12">実務未経験エンジニアによる<br class="hide-on-med-and-up"/>実務未経験エンジニアのためのブログ</h5>
+      <h5 class="sub_title col s12">Beer Wine Books & Programing</h5>
+      <!-- <h5 class="site_title sub_title col s12">実務未経験エンジニアによる<br class="hide-on-med-and-up"/>実務未経験エンジニアのためのブログ</h5> -->
     </div>
   </header>
 </template>
@@ -36,7 +37,7 @@ header {
   cursor: pointer;
 }
 .site_title {
-  font-size: 36px;
+  font-size: 40px;
   letter-spacing: 3px;
   justify-content: center;
   font-family: 'Train One', cursive;
@@ -44,9 +45,12 @@ header {
   margin-bottom: 0;
 }
 .sub_title {
-  font-size: 20px;
+  /* font-size: 20px; */
+  font-family: 'Train One', cursive;
   padding: 0 20px;
   text-align: center;
+  text-shadow: 2px 2px 1px wheat, 3px 3px 8px wheat;
+  margin-bottom: 0;
 }
 .material-icons {
   font-size: 42px;

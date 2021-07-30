@@ -60,6 +60,8 @@ app.get(apiPath + 'product', async (req, res) => {
 
   let dataList = [];
   for (result of results) {
+    // パブリックリポジトリのみ
+    // 右端の説明欄にURLが記載されているリポジトリのみ
     if (!result.private && result.homepage) {
       const data = {};
       data.name = result.name;
@@ -160,8 +162,10 @@ const getContents = async (fileNames, filePath) => {
 };
 
 const getImgPaths = (content) => {
+  // console.log(content);
   const lines = content.split('\n');
-  const imgPaths = lines.filter(line => line.includes('(img/'));
+  const imgPaths =
+    lines.filter((line) => line.includes("(img/"));
   return imgPaths;
 }
 
@@ -176,16 +180,23 @@ const getImg = async (imgPaths) => {
 
 const replaceImgPath = (content, paths, base64_imgData) => {
   let newContent = String;
-  for (let i in paths) {
+  // console.log(paths);
+  for (let pathIdx in paths) {
     //jpgもpngじゃないとブラウザで表示されなかった
-    const ext = path.extname(paths[i]).replace('.', '');
-    if (i > 0) {
+    const ext = path.extname(paths[pathIdx]).replace('.', '');
+    const thumnailPathIdx = 0;
+    if (pathIdx > thumnailPathIdx) {
+      // contents内の置換
       newContent = newContent.replace(
-        paths[i],
-        `data:image/png;base64,${base64_imgData[i]}`
+        paths[pathIdx],
+        `data:image/png;base64,${base64_imgData[pathIdx]}`
       );
     } else {
-      newContent = content.replace(paths[i], `data:image/png;base64,${base64_imgData[i]}`)
+      // thumnailの置換
+      newContent = content.replace(
+        paths[pathIdx],
+        `data:image/png;base64,${base64_imgData[pathIdx]}`
+      );
     }
   }
   return newContent;
@@ -227,10 +238,16 @@ const createFileData = async (names, infos, contents) => {
     const imgPaths = getImgPaths(contents[i])
       .map((imgPath) => imgPath.split("(")[1].slice(0, -1));
     const base64_imgData = await getImg(imgPaths);
-    const newContent = await replaceImgPath(contents[i], imgPaths, base64_imgData);
+    const newContent = await replaceImgPath(
+      contents[i],
+      imgPaths,
+      base64_imgData
+    );
     
+    // console.log(contents[i]);
     data.content = newContent;
-    data.thumImg = base64_imgData.shift();
+  
+    data.thumImg = base64_imgData.shift()??"";
 
     fileData.push(data);
   }

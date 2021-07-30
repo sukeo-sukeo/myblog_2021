@@ -29,7 +29,8 @@ export default {
     isMovileView: Boolean
   },
   methods: {
-  
+  },
+  mounted() {
   },
   updated() {
   },
@@ -82,6 +83,10 @@ export default {
 .markdown >>> h3 {
   font-size: 20px;
   font-weight: bold;
+}
+.markdown >>> strong {
+  font-weight: bold;
+  font-size: 18px;
 }
 .markdown >>> blockquote {
   color: rgb(167, 161, 161);

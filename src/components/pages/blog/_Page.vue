@@ -24,9 +24,10 @@
 
         <transition name="fadein">
           <content-card
-            :blogData="blog"
-            :isMovileView="isMovileView"
-            v-show="isOpenContent[idx]"
+           ref="content"
+           :blogData="blog"
+           :isMovileView="isMovileView"
+           v-show="isOpenContent[idx]"
           ></content-card>
         </transition>
   
@@ -86,7 +87,7 @@ export default {
     showTitle: true,
     isLoader: true,
     totalTitleHeight: 0,
-    idx: Number
+    idx: Number,
   }),
   props: {
     c_Height: [Array, Object, Function],
@@ -100,7 +101,7 @@ export default {
     async fetchBlog() {
       const blogs = await this.$axios.get(`${this.baseURL}/node`).then((res) => res.data);
 
-      // console.log(blogs);
+      console.log(blogs);
       this.blogs = blogs;
 
       //コンテンツの開閉状態を初期化
@@ -164,6 +165,30 @@ export default {
         category: blog.category,
         title: blog.title.length >= 30? blog.title.slice(0,30) + "..." : blog.title
       }
+    },
+    getCommnets() {
+      const contentRef = this.$refs.content;
+      const mdContents = contentRef.map(ref => ref.$el.lastChild);
+      const comments = mdContents.map(mdContent => {
+        const nodes = mdContent.childNodes; 
+        return [...nodes].filter(node => node.nodeType === 8);
+      });
+      
+      // 以下コメントをトリガーとした追加機能の記述場所
+
+      // fiexdコメントの場所にdiv要素を挿入
+      this.replaceFixedCommentToDiv(comments);
+    },
+    replaceFixedCommentToDiv(commentsList) {
+      const fixedCommentsList = commentsList.map(comments => comments.filter(comment => comment.data.trim() === "fixed"));
+      
+      fixedCommentsList.forEach(fixedComments => {
+        fixedComments.forEach((fixedComment, idx) => {
+          const div = document.createElement('div');
+          div.classList.add(`fixed`, `fixed_${idx}`);
+          fixedComment.replaceWith(div);
+        })
+      })
     }
   },
   created() {
@@ -171,6 +196,9 @@ export default {
   },
   mounted() {
     // 'HOME', this.routeData[0].name.toUpperCase(), blog.category , blog.title]
+    // mounted直後ではHTMLCollectionがうまくとれなかったので少し遅延させる
+    // updatedで複数回呼ばれていたの気になったので
+    setTimeout(() => this.getCommnets(), 500);
   },
   updated() {
     Prism.highlightAll();
