@@ -101,7 +101,7 @@ export default {
     async fetchBlog() {
       const blogs = await this.$axios.get(`${this.baseURL}/node`).then((res) => res.data);
 
-      console.log(blogs);
+      // console.log(blogs);
       this.blogs = blogs;
 
       //コンテンツの開閉状態を初期化

@@ -23,6 +23,7 @@ export default {
   data: () => ({
     repos: Array,
     isLoader: true,
+    excludeRepoNames: ["TIL"]
   }),
   props: {
     baseURL: String,
@@ -30,8 +31,8 @@ export default {
   methods: {
     async fetchGitApi() {
       const products = await this.$axios.get(`${this.baseURL}/node/product`).then((res) => res.data);
-      this.repos = products;
-      // console.log(this.repos);
+      // 除外リストに該当しないデータのみ取得
+      this.repos = products.filter(product => !this.excludeRepoNames.includes(product.name));
     },
   },
   created() {
