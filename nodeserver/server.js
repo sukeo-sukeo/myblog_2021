@@ -5,6 +5,7 @@ const path = require("path");
 const fs = require("fs").promises;
 const Twitter = require("twitter-v2");
 const fetch = require("node-fetch");
+const { Client } = require("node-scp");
 
 require('dotenv').config();
 
@@ -28,6 +29,10 @@ if (USER === 'root') {
   filePath = `${__dirname}/blogs/`;
   apiPath = '/node/';
 }
+
+app.get(apiPath + "test", async (req, res) => {
+  res.send("test ok!");
+});
 
 // ブログデータを取得
 app.get(apiPath, async (req, res) => {
@@ -105,7 +110,34 @@ app.get(apiPath + 'profile', async (req, res) => {
   res.json({twitterProfile: data});
 });
 
+// gasからのpost
+app.post(apiPath, async (req, res) => {
+  console.log(req.body);
+  const title = req.body.title;
+  const content = req.body.content;
+  // const path_from = `${__dirname}/test/${title}.md`;
+  // const path_to = `/Users/yusuke/Desktop/mddir/`;
+  const path_from = `${filePath}/${title}.md `;
+  const path_to = `/Users/yusuke/Desktop/mddir/`;
+  await fs.writeFile(`${path_from}`, content);
 
+  // 上書きの対策
+
+  try {
+    const client = await Client({
+      host: process.env.SCP_HOST,
+      port: process.env.SCP_PORT,
+      username: process.env.SCP_USERNAME,
+      password: process.env.SCP_PASSWORD,
+    });
+    await client.uploadFile(path_from, path_to);
+    client.close();
+  } catch (e) {
+    console.log(e);
+  }
+
+  res.send("respons OK!");
+});
 
 
 
