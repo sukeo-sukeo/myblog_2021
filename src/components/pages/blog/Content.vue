@@ -3,7 +3,7 @@
 
     <at-times :blogData="blogData"></at-times>
 
-    <h4>{{ blogData.title }}</h4>
+    <h4>{{ blogData.title | cut_gdid }}</h4>
     <blog-tags :blogData="blogData"></blog-tags>
     <vue-markdown class="markdown">
       {{ blogData.content }}

@@ -6,8 +6,12 @@ const fs = require("fs").promises;
 const Twitter = require("twitter-v2");
 const fetch = require("node-fetch");
 const { Client } = require("node-scp");
+const wget = require("node-wget-promise");
+// const util = require("util");
+// const childProcess = require("child_process");
+// const exec = util.promisify(childProcess.exec);
 
-require('dotenv').config();
+require("dotenv").config();
 
 const port = process.env.port || process.env.PORT || 3030;
 
@@ -19,36 +23,35 @@ app.use(bodyParser.json());
 
 let filePath = String;
 let apiPath = String;
+
+// 環境変数のUSER名でローカル(テスト)かサーバー(本番)か判別
 const USER = process.env.USER;
-if (USER === 'root') {
+if (USER === "root") {
   // product
   filePath = `/var/www/html/blogs`;
-  apiPath = '/';
+  apiPath = "/";
 } else {
   // local
   filePath = `${__dirname}/blogs/`;
-  apiPath = '/node/';
+  apiPath = "/node/";
 }
-
-app.get(apiPath + "test", async (req, res) => {
-  res.send("test ok!");
-});
 
 // ブログデータを取得
 app.get(apiPath, async (req, res) => {
+  console.log(USER);
   const fileNames = await getFileNames(filePath);
   const fileInfos = await getFileInfos(fileNames, filePath);
   const contents = await getContents(fileNames, filePath);
   const blogData = await createFileData(fileNames, fileInfos, contents);
 
   // 作成時間順に並び替え
-  sortBlog(blogData)
-  
+  sortBlog(blogData);
+
   res.json(blogData);
 });
 
 // githubからレポジトリ情報を取得
-app.get(apiPath + 'product', async (req, res) => {
+app.get(apiPath + "product", async (req, res) => {
   const GITHUB_API_URL = "https://api.github.com";
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const USERNAME = "sukeo-sukeo";
@@ -92,7 +95,7 @@ app.get(apiPath + 'product', async (req, res) => {
 });
 
 // twitterから情報を取得
-app.get(apiPath + 'profile', async (req, res) => {
+app.get(apiPath + "profile", async (req, res) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_APIKEY,
     consumer_secret: process.env.TWITTER_SECRET_KEY,
@@ -106,23 +109,73 @@ app.get(apiPath + 'profile', async (req, res) => {
 
   const { data } = await client.get(`users/${userId}`, params);
   const imgSize = "_200x200";
-  data.profile_image_url = data.profile_image_url.replace('_normal', imgSize);
-  res.json({twitterProfile: data});
+  data.profile_image_url = data.profile_image_url.replace("_normal", imgSize);
+  res.json({ twitterProfile: data });
 });
 
-// gasからのpost
+// google apps script からのブログ投稿を受け取り成形し公開する
 app.post(apiPath, async (req, res) => {
-  console.log(req.body);
-  const title = req.body.title;
-  const content = req.body.content;
-  // const path_from = `${__dirname}/test/${title}.md`;
-  // const path_to = `/Users/yusuke/Desktop/mddir/`;
-  const path_from = `${filePath}/${title}.md `;
-  const path_to = `/Users/yusuke/Desktop/mddir/`;
-  await fs.writeFile(`${path_from}`, content);
+  let title = req.body.title;
+  let content = req.body.content;
+  const [thumnailId, thumnailURL] = getThumnailId(content);
+    
+  let blogPath_from = String;
+  let blogPath_to = String;
+  let thumnailPath_from = String;
+  let thumnailPath_to = String;
+  let thumnailPath = String;
 
-  // 上書きの対策
+  if (USER === "root") {
+    // public
+    blogPath_from = `${filePath}/${title}.md`;
+    blogPath_to = `/Users/yusuke/Desktop/mddir/${title}.md`;
+    thumnailPath_from = `${filePath}/img/gas/${thumnailId}.png`;
+    thumnailPath_to = `/Users/yusuke/Desktop/mddir/img/gas/${thumnailId}.png`;
+    thumnailPath = `img/gas/${thumnailId}.png`;
 
+  } else {
+    // local
+    // blogs/test をサーバー blogs/ をローカルに見立ててscpする
+    blogPath_from = `${__dirname}/blogs/test/${title}.md`;
+    blogPath_to = `${__dirname}/blogs/${title}.md`;
+    thumnailPath_from = `${__dirname}/blogs/img/imgtest/${thumnailId}.png`;
+    thumnailPath_to = `${__dirname}/blogs/img/${thumnailId}.png`;
+    thumnailPath = `img/${thumnailId}.png`;
+
+  }
+  
+  // blog記事内のthumnailURLをサーバー内の画像へのpathに置換
+  content = content.replace(thumnailURL, thumnailPath);
+
+  // blogファイルをサーバーへ保存
+  await fs.writeFile(blogPath_from, content);
+  if (USER === "root") {
+    const uid = 1000;
+    const gid = 1000;
+    await fs.chown(blogPath_from, uid, gid);
+  }
+  // ローカルへコピー
+  await scpFile(blogPath_from, blogPath_to);
+  
+  // google drive からサムネイルを取得しサーバーへ保存
+  const output = thumnailPath_from;
+  const url = `https://drive.google.com/uc?export=download&id=${thumnailId}`;
+  await wget(url, { output });
+  // ローカルへコピー
+  await scpFile(thumnailPath_from, thumnailPath_to)
+
+  res.send("respons OK!");
+});
+
+const getThumnailId = (content) => {
+  const url = content
+    .split("![thumnail](")[1]
+    .split(")")[0];
+  const id = url.split("id=")[1];
+  return [id, url];
+};
+
+const scpFile = async (path_from, path_to) => {
   try {
     const client = await Client({
       host: process.env.SCP_HOST,
@@ -135,11 +188,7 @@ app.post(apiPath, async (req, res) => {
   } catch (e) {
     console.log(e);
   }
-
-  res.send("respons OK!");
-});
-
-
+};
 
 const sortBlog = (blogData) => {
   blogData.sort((a, b) => {
@@ -149,7 +198,7 @@ const sortBlog = (blogData) => {
       return 1;
     }
   });
-}
+};
 
 const getFileNames = async (filePath) => {
   const fileNames = await fs.readdir(filePath);
@@ -167,11 +216,11 @@ const getFileInfos = async (fileNames, filePath) => {
       .split(" ")[0]
       .replace("/", "-")
       .replace("/", "-");
-    
+
     // 月、日に0をつける処理
-    const y = infos.mtime.split("-")[0]; 
-    const m = infos.mtime.split("-")[1]; 
-    const d = infos.mtime.split("-")[2]; 
+    const y = infos.mtime.split("-")[0];
+    const m = infos.mtime.split("-")[1];
+    const d = infos.mtime.split("-")[2];
     if (m.length === 1) {
       infos.mtime = `${y}-0${m}-${d}`;
     }
@@ -195,16 +244,17 @@ const getContents = async (fileNames, filePath) => {
 
 const getImgPaths = (content) => {
   // console.log(content);
-  const lines = content.split('\n');
-  const imgPaths =
-    lines.filter((line) => line.includes("(img/"));
+  const lines = content.split("\n");
+  const imgPaths = lines.filter((line) => line.includes("(img/"));
   return imgPaths;
-}
+};
 
 const getImg = async (imgPaths) => {
   let imgs = [];
   for (imgPath of imgPaths) {
-    const img = await fs.readFile(`${filePath}/${imgPath}`, { encoding: 'base64' });
+    const img = await fs.readFile(`${filePath}/${imgPath}`, {
+      encoding: "base64",
+    });
     imgs.push(img);
   }
   return imgs;
@@ -215,7 +265,7 @@ const replaceImgPath = (content, paths, base64_imgData) => {
   // console.log(paths);
   for (let pathIdx in paths) {
     //jpgもpngじゃないとブラウザで表示されなかった
-    const ext = path.extname(paths[pathIdx]).replace('.', '');
+    const ext = path.extname(paths[pathIdx]).replace(".", "");
     const thumnailPathIdx = 0;
     if (pathIdx > thumnailPathIdx) {
       // contents内の置換
@@ -232,7 +282,7 @@ const replaceImgPath = (content, paths, base64_imgData) => {
     }
   }
   return newContent;
-}
+};
 
 const createFileData = async (names, infos, contents) => {
   const fileData = [];
@@ -259,7 +309,7 @@ const createFileData = async (names, infos, contents) => {
       .split("\n")[1]
       .replace("<!--", "")
       .replace("-->", "");
-    
+
     // tagの取得
     data.tag = contents[i]
       .split("\n")[2]
@@ -267,24 +317,24 @@ const createFileData = async (names, infos, contents) => {
       .replace("-->", "");
 
     // mdファイル内の画像をbase64に置換
-    const imgPaths = getImgPaths(contents[i])
-      .map((imgPath) => imgPath.split("(")[1].slice(0, -1));
+    const imgPaths = getImgPaths(contents[i]).map((imgPath) =>
+      imgPath.split("(")[1].slice(0, -1)
+    );
     const base64_imgData = await getImg(imgPaths);
     const newContent = await replaceImgPath(
       contents[i],
       imgPaths,
       base64_imgData
     );
-    
+
     // console.log(contents[i]);
     data.content = newContent;
-  
-    data.thumImg = base64_imgData.shift()??"";
+
+    data.thumImg = base64_imgData.shift() ?? "";
 
     fileData.push(data);
   }
   return fileData;
 };
-
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

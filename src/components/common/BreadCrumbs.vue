@@ -8,7 +8,7 @@
         :class="{movile_fontsize: isMovileView}"
         v-for="(bread, key) in breads" :key="bread"
         @click="routingView(key, bread)"
-        >{{ bread }}</span>
+        >{{ bread | cut_gdid }}</span>
       </div>
     </div>
   </nav>

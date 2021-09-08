@@ -13,7 +13,7 @@
 
 
     <div class="card-staced col s12 m8">
-      <h5>{{ blogData.title }}</h5>
+      <h5>{{ blogData.title | cut_gdid }}</h5>
       <at-times :blogData="blogData"></at-times>
 
       <div class="divider"></div>
