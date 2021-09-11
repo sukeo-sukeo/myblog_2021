@@ -81,6 +81,21 @@ export default {
   min-width: 200px;
   position: relative;
 }
+.card-image img {
+  height: 200px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+.card-image::after {
+  position: absolute;
+  content: '';
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  box-shadow: inset 0 0 15px 15px white;
+}
+
 .card-staced {
   /* height: 100px; */
   padding-left: 2%;

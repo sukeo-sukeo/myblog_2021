@@ -19,7 +19,8 @@ const hello = `this is code block`
 
 1. num
 1. num
-
+- list
+- list
 ==hello==
 
 **強調**

@@ -7,6 +7,7 @@ const Twitter = require("twitter-v2");
 const fetch = require("node-fetch");
 const { Client } = require("node-scp");
 const wget = require("node-wget-promise");
+const sharp = require("sharp");
 // const util = require("util");
 // const childProcess = require("child_process");
 // const exec = util.promisify(childProcess.exec);
@@ -161,11 +162,32 @@ app.post(apiPath, async (req, res) => {
   const output = thumnailPath_from;
   const url = `https://drive.google.com/uc?export=download&id=${thumnailId}`;
   await wget(url, { output });
+
+  // 画像を取得
+  const img = await fs.readFile(output);
+  // 画像をリサイズ
+  const resizedImg = await imgResize(img);
+  // 画像を上書き
+  await fs.writeFile(output, resizedImg);
   // ローカルへコピー
   await scpFile(thumnailPath_from, thumnailPath_to)
 
-  res.send("respons OK!");
+  res.send("投稿が完了しました!");
 });
+
+
+const imgResize = async (img) => {
+  const HEIGHT = 270;
+  const WIDTH = HEIGHT * 1.4;
+  const option = {
+    fit: "contain",
+    background: {r: 255, g: 255, b: 255},
+  };
+  
+  const resizedImg = await sharp(img).resize(WIDTH, HEIGHT, option).png().toBuffer();
+  return resizedImg;
+}
+
 
 const getThumnailId = (content) => {
   const url = content

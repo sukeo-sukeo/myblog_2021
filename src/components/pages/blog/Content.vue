@@ -48,9 +48,17 @@ export default {
   padding: 30px 10px;
   padding-bottom: 100px;
 }
-.content >>> img {
+
+.content >>> p:first-child > img {
   width: 100%;
+  margin: 0;
 }
+
+.content >>> img {
+  width: 80%;
+  margin: 50px 0 50px 10%;
+}
+
 .content > h4 {
   margin-top: 0;
   font-weight: bold;
@@ -66,10 +74,12 @@ export default {
   text-decoration: underline;
   color: #0000EE
 }
-.markdown >>> li {
+.markdown >>> ul > li {
   list-style: inside;
-  /* font-size: 18px; */
 }
+/* .markdown >>> ul > li::marker {
+  margin-right: 0 !important;
+} */
 .markdown >>> h1 {
   margin-top: 100px;
   font-size: 36px;
