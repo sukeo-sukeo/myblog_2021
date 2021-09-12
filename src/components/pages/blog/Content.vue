@@ -70,6 +70,11 @@ export default {
 /* .markdown >>> p {
   font-size: 18px;
 } */
+.markdown >>> hr {
+  height: 5px;
+  background-image: linear-gradient(to right, transparent, #ccc, transparent);
+  border: none;
+}
 .markdown >>> a {
   text-decoration: underline;
   color: #0000EE
@@ -81,10 +86,12 @@ export default {
   margin-right: 0 !important;
 } */
 .markdown >>> h1 {
-  margin-top: 100px;
+  margin-top: 70px;
   font-size: 36px;
   font-weight: bold;
   filter: drop-shadow(2px 4px 6px wheat);
+  width: fit-content;
+  border-bottom: solid 3px wheat;
 }
 .markdown >>> h2 {
   font-size: 24px;

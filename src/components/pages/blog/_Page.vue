@@ -21,7 +21,7 @@
           @title-click="toggleContent(idx)"
           v-show="showTitle"
         ></title-card>
-
+        
         <transition name="fadein">
           <content-card
            ref="content"

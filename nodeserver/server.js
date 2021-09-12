@@ -8,9 +8,6 @@ const fetch = require("node-fetch");
 const { Client } = require("node-scp");
 const wget = require("node-wget-promise");
 const sharp = require("sharp");
-// const util = require("util");
-// const childProcess = require("child_process");
-// const exec = util.promisify(childProcess.exec);
 
 require("dotenv").config();
 
