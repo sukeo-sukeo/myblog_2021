@@ -35,7 +35,7 @@
         
       </section>
       
-      <transition name="fadeinout">
+      <!-- <transition name="fadeinout">
         <any-btn
         @title-click="toggleContent(idx)"
         :btnIcon="`first_page`"
@@ -46,7 +46,7 @@
         :btnColor="`grey lighten-1`" :c_Height="c_Height" :isStop="isStopBeforeFooter" 
         v-if="isOpenContent[idx]"
         v-show="topReturnBtnActive"></any-btn>
-      </transition>
+      </transition> -->
 
       <transition name="fadeinout">
         <any-btn 
@@ -242,6 +242,5 @@ export default {
 </script>
 
 <style scoped>
-
 
 </style>

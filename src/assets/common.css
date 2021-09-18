@@ -36,6 +36,14 @@ a:active {
   opacity: 0;
 }
 
+.slide-enter-active, .slide-leave-active {
+  transform: translate(0px, 0px);
+  transition: transform 350ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+}
+.slide-enter, .slide-leave-to {
+  transform: translateX(-100vw) translateX(0px);
+}
+
 .loader {
   position: absolute;
   z-index: 1000;

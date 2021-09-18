@@ -1,21 +1,39 @@
 <template>
-  <div class="">
-    <header-bar ref="header"></header-bar>
-    <nav-bar ref="navbar" 
-    :routeData="routeData"
-    ></nav-bar>
+  <div>
 
-    <article :class="{container: !isMovileView}">
-      <router-view 
-      :baseURL="baseURL"
-      :isMovileView="isMovileView"
-      :topReturnBtnActive="topReturnBtnActive"
-      :isStopBeforeFooter="isStopBeforeFooter"
+    <transition name="fadeinout">
+      <a class="sidebar_btn btn-flat"
+      :class="sideIsOpen? 'sidebar_open' : 'sidebar_close'"
+      @click="sideBarBtn"
+      v-show="sideBarBtnIsShow"
+      >
+        <mt-icon :iconName="sideIsOpen? 'close' : 'menu'"></mt-icon>
+      </a>
+    </transition>
+
+    <transition name="slide">
+      <side-bar v-if="sideIsOpen"></side-bar>
+    </transition>
+
+    <div :class="sideIsOpen? (!isMovileView ? 'sidebar_open' : '') : 'sidebar_close'">
+      <header-bar ref="header"></header-bar>
+      <nav-bar ref="navbar" 
       :routeData="routeData"
-      :c_Height="c_Height" />
-    </article>
+      ></nav-bar>
 
-    <footer-bar ref="footer"></footer-bar>
+      <article :class="{container: !isMovileView}">
+        <router-view 
+        :baseURL="baseURL"
+        :isMovileView="isMovileView"
+        :topReturnBtnActive="topReturnBtnActive"
+        :isStopBeforeFooter="isStopBeforeFooter"
+        :routeData="routeData"
+        :c_Height="c_Height" />
+      </article>
+
+      <footer-bar ref="footer"></footer-bar>
+    </div>
+    
   </div>
 </template>
 
@@ -23,7 +41,9 @@
 import router from './router/index';
 import HeaderBar from './components/common/Header';
 import NavBar from './components/common/NavBar';
+import SideBar from './components/common/SideBar';
 import FooterBar from './components/common/Footer';
+import MtIcon from './components/atoms/MtIcon.vue';
 // import BlogPage from './components/pages/blog/_Page';
 
 export default {
@@ -32,7 +52,9 @@ export default {
     // BlogPage,
     HeaderBar,
     NavBar,
-    FooterBar
+    SideBar,
+    FooterBar,
+    MtIcon
   },
   data: () => ({
     c_Height: Object,
@@ -44,9 +66,14 @@ export default {
     movileViewMinWidth: 600,
     isMovileView: false,
     routeData: Array,
-    baseURL: String
+    baseURL: String,
+    sideIsOpen: false,
+    sideBarBtnIsShow: true
   }),
   methods: {
+    sideBarBtn() {
+      this.sideIsOpen = !this.sideIsOpen
+    },
     browserBack() {
       router.push('/').catch(() => location.reload())
     },
@@ -151,12 +178,42 @@ export default {
     scroll: function(amount) {
       this.judgeShowTopBtn(amount);
       this.judgeStopTopBtn(amount);
+
+      if (!this.sideIsOpen) {
+        this.sideBarBtnIsShow = false;
+        setTimeout(() => this.sideBarBtnIsShow = true, 2000);
+      }
     },
+    // sideIsOpen: function(amount) {
+    //   console.log(amount);
+    // }
   }
 };
 </script>
 
 <style scoped>
+.sidebar_open {
+  width: calc(100% - 220px);
+  margin-left: 220px;
+  transition: 0.1s;
+}
+.sidebar_close {
+  width: 100%;
+  margin-left: 0;
+  /* transition: all 0.5s 0s ease; */
+}
+.sidebar_btn {
+  position: fixed;
+  color: wheat;
+  margin-top: 20px;
+  z-index: 1000;
+  width: auto;
+}
+.sidebar_btn > span {
+  font-size : 32px;
+  text-shadow: 2px 2px 5px grey;
+}
+
 .container {
   width: 90%;
   margin-bottom: 50px;

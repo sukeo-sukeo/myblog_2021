@@ -47,6 +47,8 @@ export default {
           break;
 
         case "category":
+          // eventbus使用
+          // @category-click="method"で受け取る
           this.$emit('category-click', bread);
           break;
         case "title":
