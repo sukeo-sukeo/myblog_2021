@@ -67,6 +67,8 @@ import BreadCrumbs from "../../common/BreadCrumbs";
 import LoaderCircle from "../../atoms/LoaderCircle";
 import AnyBtn from "../../atoms/AnyBtn";
 import Prism from "prismjs";
+import 'prismjs/plugins/line-numbers/prism-line-numbers.min.js'
+import 'prismjs/plugins/line-numbers/prism-line-numbers.css'
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-markdown";
 import "prismjs/themes/prism-okaidia.css";
@@ -181,27 +183,40 @@ export default {
         title: blog.title.length >= 30? blog.title.slice(0,30) + "..." : blog.title
       }
     },
-    getCommnets() {
-      const contentRef = this.$refs.content;
-      const mdContents = contentRef.map(ref => ref.$el.lastChild);
-      const comments = mdContents.map(mdContent => {
-        const nodes = mdContent.childNodes; 
-        return [...nodes].filter(node => node.nodeType === 8);
-      });
+    // getCommnets() {
+    //   const contentRef = this.$refs.content;
+    //   const mdContents = contentRef.map(ref => ref.$el.lastChild);
+    //   const comments = mdContents.map(mdContent => {
+    //     const nodes = mdContent.childNodes; 
+    //     return [...nodes].filter(node => node.nodeType === 8);
+    //   });
       
-      // 以下コメントをトリガーとした追加機能の記述場所
+    //   // 以下コメントをトリガーとした追加機能の記述場所
 
-      // fiexdコメントの場所にdiv要素を挿入
-      this.replaceFixedCommentToDiv(comments);
-    },
-    replaceFixedCommentToDiv(commentsList) {
-      const fixedCommentsList = commentsList.map(comments => comments.filter(comment => comment.data.trim() === "fixed"));
+    //   // fiexdコメントの場所にdiv要素を挿入
+    //   this.replaceFixedCommentToDiv(comments);
+    // },
+    // replaceFixedCommentToDiv(commentsList) {
+    //   const fixedCommentsList = commentsList.map(comments => comments.filter(comment => comment.data.trim() === "fixed"));
       
-      fixedCommentsList.forEach(fixedComments => {
-        fixedComments.forEach((fixedComment, idx) => {
-          const div = document.createElement('div');
-          div.classList.add(`fixed`, `fixed_${idx}`);
-          fixedComment.replaceWith(div);
+    //   fixedCommentsList.forEach(fixedComments => {
+    //     fixedComments.forEach((fixedComment, idx) => {
+    //       const div = document.createElement('div');
+    //       div.classList.add(`fixed`, `fixed_${idx}`);
+    //       fixedComment.replaceWith(div);
+    //     })
+    //   })
+    // }
+    setLineNumbers() {
+      const contentRef = this.$refs.content
+      const mdContents = contentRef.map(ref => ref.$el.lastChild);
+      const preHTMLTagsList = mdContents.map(mdContent => {
+        const nodes = mdContent.childNodes;
+        return [...nodes].filter(node => node.tagName === "PRE");
+      });
+      preHTMLTagsList.forEach(preHTMLTags => {
+        preHTMLTags.forEach(preHTMLTag => {
+          preHTMLTag.classList.add("line-numbers")
         })
       })
     }
@@ -214,7 +229,8 @@ export default {
     // 'HOME', this.routeData[0].name.toUpperCase(), blog.category , blog.title]
     // mounted直後ではHTMLCollectionがうまくとれなかったので少し遅延させる
     // updatedで複数回呼ばれていたの気になったので
-    setTimeout(() => this.getCommnets(), 500);
+    // setTimeout(() => this.getCommnets(), 1000);
+    setTimeout(() => this.setLineNumbers(), 1000)
   },
   updated() {
     Prism.highlightAll();
