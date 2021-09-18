@@ -115,13 +115,18 @@ app.get(apiPath + "profile", async (req, res) => {
 app.post(apiPath, async (req, res) => {
   let title = req.body.title;
   let content = req.body.content;
+  
   const [thumnailId, thumnailURL] = getThumnailId(content);
-    
+  const [imgIds, imgUrls] = getImgIds(content);
+  
   let blogPath_from = String;
   let blogPath_to = String;
   let thumnailPath_from = String;
   let thumnailPath_to = String;
   let thumnailPath = String;
+  let imgPaths_from = Array;
+  let imgPaths_to = Array;
+  let imgPaths = Array;
 
   if (USER === "root") {
     // public
@@ -130,7 +135,9 @@ app.post(apiPath, async (req, res) => {
     thumnailPath_from = `${filePath}/img/gas/${thumnailId}.png`;
     thumnailPath_to = `/Users/yusuke/Desktop/mddir/img/gas/${thumnailId}.png`;
     thumnailPath = `img/gas/${thumnailId}.png`;
-
+    imgPaths_from = imgIds.map(imgId => `${filePath}/img/gas/content/${imgId}.png`)
+    imgPaths_to = imgIds.map(imgId => `/Users/yusuke/Desktop/mddir/img/gas/content/${imgId}.png`)
+    imgPaths = imgIds.map(imgId => `img/gas/content/${imgId}.png`);
   } else {
     // local
     // blogs/test をサーバー blogs/ をローカルに見立ててscpする
@@ -139,11 +146,15 @@ app.post(apiPath, async (req, res) => {
     thumnailPath_from = `${__dirname}/blogs/img/imgtest/${thumnailId}.png`;
     thumnailPath_to = `${__dirname}/blogs/img/${thumnailId}.png`;
     thumnailPath = `img/${thumnailId}.png`;
-
+    imgPaths_from = imgIds.map(imgId => `${__dirname}/blogs/img/imgtest/${imgId}.png`)
+    imgPaths_to = imgIds.map(imgId => `${__dirname}/blogs/img/gasContent/${imgId}.png`)
+    imgPaths = imgIds.map(imgId => `img/gasContent/${imgId}.png`);
   }
   
   // blog記事内のthumnailURLをサーバー内の画像へのpathに置換
   content = content.replace(thumnailURL, thumnailPath);
+  // blog記事内のimgURLをサーバー内の画像へのpathに置換
+  imgUrls.forEach((imgUrl, i) => content = content.replace(imgUrl, imgPaths[i]));
 
   // blogファイルをサーバーへ保存
   await fs.writeFile(blogPath_from, content);
@@ -152,37 +163,64 @@ app.post(apiPath, async (req, res) => {
     const gid = 1000;
     await fs.chown(blogPath_from, uid, gid);
   }
-  // ローカルへコピー
-  await scpFile(blogPath_from, blogPath_to);
-  
-  // google drive からサムネイルを取得しサーバーへ保存
-  const output = thumnailPath_from;
-  const url = `https://drive.google.com/uc?export=download&id=${thumnailId}`;
-  await wget(url, { output });
 
-  // 画像を取得
-  const img = await fs.readFile(output);
-  // 画像をリサイズ
-  const resizedImg = await imgResize(img);
-  // 画像を上書き
-  await fs.writeFile(output, resizedImg);
-  // ローカルへコピー
+  
+  // google drive からサムネイルを取得&リサイズ → サーバーへ保存
+  await fetchImgAndResize(thumnailPath_from, thumnailId);
+  // google drive からコンテント内で使用の画像を取得&リサイズ → サーバーへ保存
+  imgPaths_from.forEach((imgPath_from, i) => fetchImgAndResize(imgPath_from, imgIds[i]))
+  
+
+  // ブログ記事をローカルへコピー
+  await scpFile(blogPath_from, blogPath_to);
+  // サムネイルをローカルへコピー
   await scpFile(thumnailPath_from, thumnailPath_to)
+  // コンテント内画像をローカルへコピー
+  imgPaths_from.forEach((imgPath_from, i) => scpFile(imgPath_from, imgPaths_to[i]))
 
   res.send("投稿が完了しました!");
 });
 
+const fetchImgAndResize = async (output, id) => {
 
-const imgResize = async (img) => {
-  const HEIGHT = 270;
-  const WIDTH = HEIGHT * 1.4;
+  // 画像をサーバーへDLし保存
+  const url = `https://drive.google.com/uc?export=download&id=${id}`;
+  await wget(url, { output });
+
+  // 以下リサイズ処理...封印 => 投稿側で調整
+  // const stat = await fs.stat(output);
+  // const imgSize = stat.size;
+
+  // const metaData = await sharp(output).metadata();
+  // const imgWidth = metaData.width;
+  // const imgHeight = metaData.height;
+  // // console.log(metaData);
+  // // 100KB以上の場合リサイズ
+  // if (imgSize > 100 * 1000) {
+  //   console.log("resize!");
+  //   // DLしてきた画像を取得
+  //   const img = await fs.readFile(output);
+  //   // 画像をリサイズし保存(上書き)
+  //   await imgResize(img, imgWidth, imgHeight, output);
+  //   // 画像を上書き
+  //   // await fs.writeFile(output, resizedImg);
+  // }
+}
+
+// 封印 => 投稿側で調整
+const imgResize = async (img, width, height, output) => {
+  console.log(width, height);
+  height = 500;
+  width = parseInt(height * 0.75);
+  console.log(width,height);
   const option = {
     fit: "contain",
     background: {r: 255, g: 255, b: 255},
   };
   
-  const resizedImg = await sharp(img).resize(WIDTH, HEIGHT, option).png().toBuffer();
-  return resizedImg;
+  await sharp(img).resize(width, height, option).toFile(output);
+  // const resizedImg = await sharp(img).resize(WIDTH, HEIGHT, option).png().toBuffer();
+  // return resizedImg;
 }
 
 
@@ -193,6 +231,28 @@ const getThumnailId = (content) => {
   const id = url.split("id=")[1];
   return [id, url];
 };
+
+const getImgIds = (content) => {
+  const tage = "![img](";
+  const urlAry1 = content.split(tage);
+  const urlAry2 = urlAry1.slice(1, urlAry1.length);
+
+  const urls = urlAry2.map(val => {
+    const start = 0;
+    const end = val.indexOf(")");
+    const url = val.slice(start, end);
+    return url
+  });
+
+  const ids = urlAry2.map(val => {
+    const start = val.indexOf("=") + 1;
+    const end = val.indexOf(")");
+    const id = val.slice(start, end);
+    return id
+  });
+
+  return [ids, urls]
+}
 
 const scpFile = async (path_from, path_to) => {
   try {
@@ -271,10 +331,14 @@ const getImgPaths = (content) => {
 const getImg = async (imgPaths) => {
   let imgs = [];
   for (imgPath of imgPaths) {
-    const img = await fs.readFile(`${filePath}/${imgPath}`, {
-      encoding: "base64",
-    });
-    imgs.push(img);
+    try {
+      const img = await fs.readFile(`${filePath}/${imgPath}`, {
+        encoding: "base64",
+      });
+      imgs.push(img);
+    } catch (e) {
+      console.log(e);
+    }
   }
   return imgs;
 };

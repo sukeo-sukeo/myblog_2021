@@ -26,7 +26,7 @@ export default {
     routingView(key, bread) {
       switch (key) {
         case "root":
-          location.reload();
+          this.$eventHub.$emit('blogtag-click')
           break;
         case "sub":
 
@@ -47,6 +47,7 @@ export default {
           break;
 
         case "category":
+          this.$emit('category-click', bread);
           break;
         case "title":
           break;

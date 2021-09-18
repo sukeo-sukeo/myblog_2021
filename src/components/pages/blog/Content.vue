@@ -113,5 +113,14 @@ export default {
   padding: 2px 5px;
   border-radius: 5px;
 }
+.markdown >>> tr > td:first-child {
+  width: 100px;
+  background-color: wheat;
+  text-align: center;
+  font-weight: bold;
+}
+.markdown >>> tr > td:not(td:first-child) {
+  padding-left: 20px;
+}
 
 </style>

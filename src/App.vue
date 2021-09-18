@@ -1,7 +1,9 @@
 <template>
   <div class="">
     <header-bar ref="header"></header-bar>
-    <nav-bar ref="navbar" :routeData="routeData"></nav-bar>
+    <nav-bar ref="navbar" 
+    :routeData="routeData"
+    ></nav-bar>
 
     <article :class="{container: !isMovileView}">
       <router-view 

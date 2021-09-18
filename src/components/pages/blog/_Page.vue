@@ -11,6 +11,7 @@
 
         <bread-crumbs v-show="isOpenContent[idx]"
         @title-click="toggleContent(idx)"
+        @category-click="getCategoryBlog"
         :isMovileView="isMovileView"
         :breads="createBreadData(blog)"></bread-crumbs>
   
@@ -21,7 +22,7 @@
           @title-click="toggleContent(idx)"
           v-show="showTitle"
         ></title-card>
-        
+
         <transition name="fadein">
           <content-card
            ref="content"
@@ -82,6 +83,7 @@ export default {
   },
   data: () => ({
     blogs: Array,
+    blogsOrigin: Array, 
     // isOpenTitle: [],
     isOpenContent: [],
     showTitle: true,
@@ -103,8 +105,21 @@ export default {
 
       // console.log(blogs);
       this.blogs = blogs;
+      this.blogsOrigin = blogs;
 
       //コンテンツの開閉状態を初期化
+      this.contentIsOpenInit();
+    },
+    getCategoryBlog(bread = "") {
+      const category = bread;
+      // 引数なし = 全件表示
+      if (category === "") {
+        this.blogs = this.blogsOrigin;
+      } else {
+        // 引数あり = 引数(カテゴリ)のみ表示
+        this.blogs = this.blogs.filter(blog => blog.category === category);
+      }
+       //コンテンツの開閉状態を初期化
       this.contentIsOpenInit();
     },
     culcTotalHight(refs, limit) {
@@ -195,6 +210,7 @@ export default {
     this.fetchBlog();
   },
   mounted() {
+    this.$eventHub.$on("blogtag-click", this.getCategoryBlog);
     // 'HOME', this.routeData[0].name.toUpperCase(), blog.category , blog.title]
     // mounted直後ではHTMLCollectionがうまくとれなかったので少し遅延させる
     // updatedで複数回呼ばれていたの気になったので
