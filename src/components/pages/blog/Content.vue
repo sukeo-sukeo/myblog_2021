@@ -72,7 +72,7 @@ export default {
 } */
 .markdown >>> hr {
   height: 5px;
-  background-image: linear-gradient(to right, transparent, #ccc, transparent);
+  background-image: linear-gradient(to right, transparent, wheat, transparent);
   border: none;
 }
 .markdown >>> a {
@@ -91,7 +91,8 @@ export default {
   font-weight: bold;
   filter: drop-shadow(2px 4px 6px wheat);
   width: fit-content;
-  border-bottom: solid 3px wheat;
+  border-left: 40px solid wheat;
+  padding-left: 10px;
 }
 .markdown >>> h2 {
   font-size: 24px;

@@ -1,5 +1,5 @@
 <template>
-  <header class="valign-wrapper">
+  <header class="valign-wrapper" v-prlx.mobile.background="{speed: 0.1, direction: 'x'}">
     <div class="row">
       <h1 class="site_title col s12 valign-wrapper" @click="goToHome">
         <i class="material-icons">
@@ -19,6 +19,8 @@
 <script>
 export default {
   name: 'HeaderBar',
+  data: () => ({
+  }),
   methods: {
     goToHome() {
       // console.log(this.$router)
