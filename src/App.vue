@@ -12,13 +12,16 @@
     </transition>
 
     <transition name="slide">
-      <side-bar v-if="sideIsOpen"></side-bar>
+      <side-bar v-if="sideIsOpen"
+      @menu-click="indicateResultPage"
+      ></side-bar>
     </transition>
 
     <div :class="sideIsOpen? (!isMovileView ? 'sidebar_open' : '') : 'sidebar_close'">
       <header-bar ref="header"></header-bar>
       <nav-bar ref="navbar" 
       :routeData="routeData"
+      @navmenu-click="onSearch = false"
       ></nav-bar>
 
       <article :class="{container: !isMovileView}">
@@ -28,7 +31,15 @@
         :topReturnBtnActive="topReturnBtnActive"
         :isStopBeforeFooter="isStopBeforeFooter"
         :routeData="routeData"
-        :c_Height="c_Height" />
+        :c_Height="c_Height"
+        v-show="!onSearch"
+        />
+
+        <result-page 
+        :searchType="searchType"
+        @on-search-tofalse="indicateResultPage"
+        v-show="onSearch"></result-page>
+
       </article>
 
       <footer-bar ref="footer"></footer-bar>
@@ -43,18 +54,18 @@ import HeaderBar from './components/common/Header';
 import NavBar from './components/common/NavBar';
 import SideBar from './components/common/SideBar';
 import FooterBar from './components/common/Footer';
-import MtIcon from './components/atoms/MtIcon.vue';
-// import BlogPage from './components/pages/blog/_Page';
+import MtIcon from './components/atoms/MtIcon';
+import ResultPage from './components/pages/result/_Page';
 
 export default {
   name: "App",
   components: {
-    // BlogPage,
     HeaderBar,
     NavBar,
     SideBar,
     FooterBar,
-    MtIcon
+    MtIcon,
+    ResultPage
   },
   data: () => ({
     c_Height: Object,
@@ -68,9 +79,20 @@ export default {
     routeData: Array,
     baseURL: String,
     sideIsOpen: false,
-    sideBarBtnIsShow: true
+    sideBarBtnIsShow: true,
+    onSearch: false,
+    searchType: String
   }),
   methods: {
+    indicateResultPage(menuName) {
+      if (!menuName) {
+      // resultページからブログを取得したとき
+        this.onSearch = false;
+        return;
+      } 
+      this.onSearch = true;
+      this.searchType = menuName;
+    },
     sideBarBtn() {
       this.sideIsOpen = !this.sideIsOpen
     },

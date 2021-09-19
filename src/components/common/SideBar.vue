@@ -11,7 +11,7 @@
     ></vue-bubbly-bg>
     <div class="menu_wrapper">
       <ul class="menu_container">
-        <li class="menu" v-for="menu in menus" :key="menu.name"><mt-icon :iconName="menu.icon"></mt-icon>{{ menu.name }}</li>
+        <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event)"><mt-icon :iconName="menu.icon"></mt-icon>{{ menu.name }}</li>
       </ul>
     </div>
   </aside>
@@ -23,19 +23,38 @@ import VueBubblyBg from '../atoms/VueBubblyBg';
 
 export default {
   name: 'SideBar',
+  props: {
+    
+  },
   data: () => ({
     menus: [
-      {name: "サイドバー調整中", icon: "", link: ""},
-      {name: "ホーム", icon: "home", link: ""},
-      {name: "カテゴリ", icon: "label", link: ""},
-      {name: "タグ", icon: "bookmark", link: ""},
-      {name: "アーカイブ", icon: "folder", link: ""},
-      {name: "検索", icon: "search", link: ""},
-      {name: "プロフィール", icon: "account_circle", link: ""},
-      {name: "GitHub", icon: "forward", link: ""},
-      {name: "Twitter", icon: "forward", link: ""},
+      {name: "サイドバー調整中", icon: "", link: "", event: ""},
+      {name: "ホーム", icon: "home", link: "", event: "home"},
+      {name: "カテゴリ", icon: "label", link: "", event: "category"},
+      {name: "タグ", icon: "bookmark", link: "", event: "tag"},
+      {name: "アーカイブ", icon: "folder", link: "", event: "archive"},
+      {name: "検索", icon: "search", link: "", event: "search"},
+      {name: "プロフィール", icon: "account_circle", link: "", event: "profile"},
+      {name: "GitHub", icon: "forward", link: "", event: "github"},
+      {name: "Twitter", icon: "forward", link: "", event: "twitter"},
     ]
   }),
+  methods: {
+    event(eventName) {
+      console.log(eventName);
+      switch (eventName) {
+        case "category":
+        case "tag":
+        case "archive":
+          this.$emit("menu-click", eventName)
+          this.$eventHub.$emit("open-init")
+          break;
+        default:
+          break;
+      }
+      // this.$eventHub.$emit('sidebarmenu-click', category);
+    }
+  },
   components: {
     VueBubblyBg,
     MtIcon

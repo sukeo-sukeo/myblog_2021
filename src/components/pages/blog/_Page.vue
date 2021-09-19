@@ -11,7 +11,7 @@
 
         <bread-crumbs v-show="isOpenContent[idx]"
         @title-click="toggleContent(idx)"
-        @category-click="getCategoryBlog"
+        @categoryblog-get="getCategoryBlog"
         :isMovileView="isMovileView"
         :breads="createBreadData(blog)"></bread-crumbs>
   
@@ -109,10 +109,14 @@ export default {
       this.blogs = blogs;
       this.blogsOrigin = blogs;
 
+      // イベントバスでblogデータを共有
+      this.$eventHub.$emit('fetch-blog', this.blogs);
+
       //コンテンツの開閉状態を初期化
       this.contentIsOpenInit();
     },
-    getCategoryBlog(bread = "") {
+    getCategoryBlog(bread = "", flag="") {
+      this.blogs = this.blogsOrigin;
       const category = bread;
       // 引数なし = 全件表示
       if (category === "") {
@@ -121,8 +125,12 @@ export default {
         // 引数あり = 引数(カテゴリ)のみ表示
         this.blogs = this.blogs.filter(blog => blog.category === category);
       }
+
+      // flagありのときはresultページから
+      if (flag === "") {
        //コンテンツの開閉状態を初期化
-      this.contentIsOpenInit();
+        this.contentIsOpenInit();
+      }
     },
     culcTotalHight(refs, limit) {
       let totalHeight = 0;
@@ -131,13 +139,16 @@ export default {
       }
       return totalHeight;
     },
-    toggleContent(idx) {
+    toggleContent(idx, flag="") {
       this.idx = idx;
+      // flagありのときはresultページから
+      if (flag === "") {
       // topからタイトル要素までのheightを保存
-      if (!this.isOpenContent[idx]) {
-        const titleDOM = this.$refs.title;
-        this.totalTitleHeight = this.culcTotalHight(titleDOM, idx)
-      }
+        if (!this.isOpenContent[idx]) {
+          const titleDOM = this.$refs.title;
+          this.totalTitleHeight = this.culcTotalHight(titleDOM, idx)
+        }
+      } 
 
       // コンテンツを閉じる処理
       if (this.isOpenContent[idx]) {
@@ -225,7 +236,16 @@ export default {
     this.fetchBlog();
   },
   mounted() {
-    this.$eventHub.$on("blogtag-click", this.getCategoryBlog);
+    // パンくずリストからemit
+    this.$eventHub.$on("categoryblog-get", this.getCategoryBlog);
+    // リザルトページからemit
+    this.$eventHub.$on("oneBlog-get", this.toggleContent);
+    // リザルトページからemit
+    this.$eventHub.$on("category-push", this.getCategoryBlog);
+    // サイドバーからemit
+    this.$eventHub.$on("open-init",  this.contentIsOpenInit);
+    
+    
     // 'HOME', this.routeData[0].name.toUpperCase(), blog.category , blog.title]
     // mounted直後ではHTMLCollectionがうまくとれなかったので少し遅延させる
     // updatedで複数回呼ばれていたの気になったので

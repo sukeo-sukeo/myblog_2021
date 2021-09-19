@@ -26,7 +26,8 @@ export default {
     routingView(key, bread) {
       switch (key) {
         case "root":
-          this.$eventHub.$emit('blogtag-click')
+           // eventbus使用
+          this.$eventHub.$emit('categoryblog-get')
           break;
         case "sub":
 
@@ -47,9 +48,8 @@ export default {
           break;
 
         case "category":
-          // eventbus使用
           // @category-click="method"で受け取る
-          this.$emit('category-click', bread);
+          this.$emit('categoryblog-get', bread);
           break;
         case "title":
           break;

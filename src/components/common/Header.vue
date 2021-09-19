@@ -2,13 +2,7 @@
   <header class="valign-wrapper" v-prlx.mobile.background="{speed: 0.1, direction: 'x'}">
     <div class="row">
       <h1 class="site_title col s12 valign-wrapper" @click="goToHome">
-        <i class="material-icons">
-          laptop_mac
-        </i>
         スケオブログ
-        <i class="material-icons">
-          code_off
-        </i>
       </h1>
       <h5 class="sub_title col s12">Beer Wine Books & Programing</h5>
       <!-- <h5 class="site_title sub_title col s12">実務未経験エンジニアによる<br class="hide-on-med-and-up"/>実務未経験エンジニアのためのブログ</h5> -->
