@@ -24,7 +24,7 @@ import VueBubblyBg from '../atoms/VueBubblyBg';
 export default {
   name: 'SideBar',
   props: {
-    
+    c_Height: [Object]
   },
   data: () => ({
     menus: [
@@ -46,13 +46,20 @@ export default {
         case "category":
         case "tag":
         case "archive":
-          this.$emit("menu-click", eventName)
+          // blogPageコンポーネントへ
+          this.$eventHub.$emit("sidemenu-click", eventName)
+          // blogPageコンポーネントへ
           this.$eventHub.$emit("open-init")
           break;
         default:
           break;
       }
-      // this.$eventHub.$emit('sidebarmenu-click', category);
+      // ヘッダーの下へ移動
+      const headerHeight = this.c_Height.header;
+      scrollTo({
+        top: headerHeight,
+        behavior: 'smooth'
+      });
     }
   },
   components: {

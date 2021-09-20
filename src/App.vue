@@ -12,8 +12,9 @@
     </transition>
 
     <transition name="slide">
-      <side-bar v-if="sideIsOpen"
-      @menu-click="indicateResultPage"
+      <side-bar 
+      v-if="sideIsOpen"
+      :c_Height="c_Height"
       ></side-bar>
     </transition>
 
@@ -21,7 +22,6 @@
       <header-bar ref="header"></header-bar>
       <nav-bar ref="navbar" 
       :routeData="routeData"
-      @navmenu-click="onSearch = false"
       ></nav-bar>
 
       <article :class="{container: !isMovileView}">
@@ -32,13 +32,7 @@
         :isStopBeforeFooter="isStopBeforeFooter"
         :routeData="routeData"
         :c_Height="c_Height"
-        v-show="!onSearch"
         />
-
-        <result-page 
-        :searchType="searchType"
-        @on-search-tofalse="indicateResultPage"
-        v-show="onSearch"></result-page>
 
       </article>
 
@@ -55,7 +49,6 @@ import NavBar from './components/common/NavBar';
 import SideBar from './components/common/SideBar';
 import FooterBar from './components/common/Footer';
 import MtIcon from './components/atoms/MtIcon';
-import ResultPage from './components/pages/result/_Page';
 
 export default {
   name: "App",
@@ -65,7 +58,6 @@ export default {
     SideBar,
     FooterBar,
     MtIcon,
-    ResultPage
   },
   data: () => ({
     c_Height: Object,
@@ -79,20 +71,9 @@ export default {
     routeData: Array,
     baseURL: String,
     sideIsOpen: false,
-    sideBarBtnIsShow: true,
-    onSearch: false,
-    searchType: String
+    sideBarBtnIsShow: true
   }),
   methods: {
-    indicateResultPage(menuName) {
-      if (!menuName) {
-      // resultページからブログを取得したとき
-        this.onSearch = false;
-        return;
-      } 
-      this.onSearch = true;
-      this.searchType = menuName;
-    },
     sideBarBtn() {
       this.sideIsOpen = !this.sideIsOpen
     },

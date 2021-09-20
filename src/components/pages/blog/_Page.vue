@@ -7,46 +7,46 @@
         <div v-if="isLoader" class="mask"></div>
       </transition>
 
-      <section v-for="(blog, idx) in blogs" :key="blog.uid">
+      <div v-show="!onSearch">
+        <section v-for="(blog, idx) in blogs" :key="blog.uid">
 
-        <bread-crumbs v-show="isOpenContent[idx]"
-        @title-click="toggleContent(idx)"
-        @categoryblog-get="getCategoryBlog"
-        :isMovileView="isMovileView"
-        :breads="createBreadData(blog)"></bread-crumbs>
-  
-        <title-card
-          ref="title"
-          :blogData="blog"
-          :isMovileView="isMovileView"
+          <bread-crumbs v-show="isOpenContent[idx]"
           @title-click="toggleContent(idx)"
-          v-show="showTitle"
-        ></title-card>
+          @categoryblog-get="getCategoryBlog"
+          :isMovileView="isMovileView"
+          :breads="createBreadData(blog)"></bread-crumbs>
+    
+          <title-card
+            ref="title"
+            :blogData="blog"
+            :isMovileView="isMovileView"
+            @title-click="toggleContent(idx)"
+            v-show="showTitle"
+          ></title-card>
 
-        <transition name="fadein">
-          <content-card
-           ref="content"
-           :blogData="blog"
-           :isMovileView="isMovileView"
-           v-show="isOpenContent[idx]"
-          ></content-card>
-        </transition>
-  
-        
-      </section>
-      
-      <!-- <transition name="fadeinout">
-        <any-btn
-        @title-click="toggleContent(idx)"
-        :btnIcon="`first_page`"
-        :btnSize="`btn-small`"
-        :event="`backView`"
-        :positionX="90" 
-        :positionY="93" 
-        :btnColor="`grey lighten-1`" :c_Height="c_Height" :isStop="isStopBeforeFooter" 
-        v-if="isOpenContent[idx]"
-        v-show="topReturnBtnActive"></any-btn>
-      </transition> -->
+          <transition name="fadein">
+            <content-card
+            ref="content"
+            :blogData="blog"
+            :isMovileView="isMovileView"
+            v-show="isOpenContent[idx]"
+            ></content-card>
+          </transition>
+
+        </section>
+      </div>
+
+      <div v-show="onSearch">
+        <result-page 
+        :blogs="blogs"
+        :blogsOrigin="blogsOrigin"
+        :searchType="searchType"
+        @category-click="getCategoryBlog"
+        @tag-click="getTagBlog"
+        @title-click="toggleContent"
+        @search-tofalse="indicateResultPage"
+        ></result-page>
+      </div>
 
       <transition name="fadeinout">
         <any-btn 
@@ -63,6 +63,7 @@
 <script>
 import TitleCard from "./Title";
 import ContentCard from "./Content";
+import ResultPage from "./Result";
 import BreadCrumbs from "../../common/BreadCrumbs";
 import LoaderCircle from "../../atoms/LoaderCircle";
 import AnyBtn from "../../atoms/AnyBtn";
@@ -79,6 +80,7 @@ export default {
   components: {
     TitleCard,
     ContentCard,
+    ResultPage,
     LoaderCircle,
     AnyBtn,
     BreadCrumbs
@@ -92,6 +94,8 @@ export default {
     isLoader: true,
     totalTitleHeight: 0,
     idx: Number,
+    onSearch: false,
+    searchType: String
   }),
   props: {
     c_Height: [Array, Object, Function],
@@ -102,6 +106,16 @@ export default {
     baseURL: String,
   },
   methods: {
+    indicateResultPage(menuName) {
+      this.blogs = this.blogsOrigin;
+      if (!menuName) {
+      // resultページからブログを取得したとき
+        this.onSearch = false;
+        return;
+      } 
+      this.onSearch = true;
+      this.searchType = menuName;
+    },
     async fetchBlog() {
       const blogs = await this.$axios.get(`${this.baseURL}/node`).then((res) => res.data);
 
@@ -109,14 +123,11 @@ export default {
       this.blogs = blogs;
       this.blogsOrigin = blogs;
 
-      // イベントバスでblogデータを共有
-      this.$eventHub.$emit('fetch-blog', this.blogs);
-
       //コンテンツの開閉状態を初期化
       this.contentIsOpenInit();
     },
-    getCategoryBlog(bread = "", flag="") {
-      this.blogs = this.blogsOrigin;
+    getCategoryBlog(bread = "") {
+      // this.blogs = this.blogsOrigin;
       const category = bread;
       // 引数なし = 全件表示
       if (category === "") {
@@ -125,12 +136,12 @@ export default {
         // 引数あり = 引数(カテゴリ)のみ表示
         this.blogs = this.blogs.filter(blog => blog.category === category);
       }
-
-      // flagありのときはresultページから
-      if (flag === "") {
-       //コンテンツの開閉状態を初期化
-        this.contentIsOpenInit();
-      }
+      //コンテンツの開閉状態を初期化
+      this.contentIsOpenInit();
+      this.onSearch = false;
+    },
+    getTagBlog() {
+      console.log("ここを実装");
     },
     culcTotalHight(refs, limit) {
       let totalHeight = 0;
@@ -139,16 +150,13 @@ export default {
       }
       return totalHeight;
     },
-    toggleContent(idx, flag="") {
+    toggleContent(idx) {
       this.idx = idx;
-      // flagありのときはresultページから
-      if (flag === "") {
       // topからタイトル要素までのheightを保存
-        if (!this.isOpenContent[idx]) {
-          const titleDOM = this.$refs.title;
-          this.totalTitleHeight = this.culcTotalHight(titleDOM, idx)
-        }
-      } 
+      if (!this.isOpenContent[idx]) {
+        const titleDOM = this.$refs.title;
+        this.totalTitleHeight = this.culcTotalHight(titleDOM, idx)
+      }
 
       // コンテンツを閉じる処理
       if (this.isOpenContent[idx]) {
@@ -157,7 +165,7 @@ export default {
       }
 
       // ヘッダーの下へ移動
-      const headerHeight = this.c_Height.header
+      const headerHeight = this.c_Height.header;
       scrollTo(0, headerHeight);
 
       // クリックされたコンテンツを開く
@@ -238,19 +246,31 @@ export default {
   mounted() {
     // パンくずリストからemit
     this.$eventHub.$on("categoryblog-get", this.getCategoryBlog);
-    // リザルトページからemit
-    this.$eventHub.$on("oneBlog-get", this.toggleContent);
-    // リザルトページからemit
-    this.$eventHub.$on("category-push", this.getCategoryBlog);
     // サイドバーからemit
     this.$eventHub.$on("open-init",  this.contentIsOpenInit);
+    // サイドバーからemit
+    this.$eventHub.$on("sidemenu-click", this.indicateResultPage);
+    // ナブバーからemit
+    this.$eventHub.$on("blogtab-click",  this.contentIsOpenInit);
+    // ナブバーからemit
+    this.$eventHub.$on("blogtab-click",  this.indicateResultPage);
+    // ナブバーからemit
+    this.$eventHub.$on("blogtab-click",  () => {
+      // ヘッダーの下へ移動
+      const headerHeight = this.c_Height.header;
+      scrollTo({
+        top: headerHeight,
+        behavior: 'smooth'
+      })
+    });
+
+    setTimeout(() => this.setLineNumbers(), 1000)
     
     
     // 'HOME', this.routeData[0].name.toUpperCase(), blog.category , blog.title]
     // mounted直後ではHTMLCollectionがうまくとれなかったので少し遅延させる
     // updatedで複数回呼ばれていたの気になったので
     // setTimeout(() => this.getCommnets(), 1000);
-    setTimeout(() => this.setLineNumbers(), 1000)
   },
   updated() {
     Prism.highlightAll();

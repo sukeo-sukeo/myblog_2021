@@ -3,7 +3,7 @@
     <div class="nav-content row">
       <ul class="tabs tabs-transparent valign-wrapper">
         <router-link v-for="route in routeData"
-        @click.native="route.path === '/' ? $eventHub.$emit('blogtag-click') : ''; $emit('navmenu-click')"
+        @click.native="route.path === '/' ? $eventHub.$emit('blogtab-click') : ''"
         :key="route.path"
         :to="route.path"
         class="tab col s3 grey-text text-darken-4"

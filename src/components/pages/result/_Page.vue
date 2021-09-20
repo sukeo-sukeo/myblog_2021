@@ -1,19 +1,19 @@
 <template>
   <div>
-    <category-result
+    <result-category
      v-if="searchType === 'category'"
      :blogs="blogs"
      @blogtitle-click="getIdxAndEmit"
-     ></category-result>
-    <tag-result v-if="searchType === 'tag'"></tag-result>
-    <archive-result v-if="searchType === 'archive'"></archive-result>
+     ></result-category>
+    <result-tag v-if="searchType === 'tag'"></result-tag>
+    <result-archive v-if="searchType === 'archive'"></result-archive>
   </div>
 </template>
 
 <script>
-import CategoryResult from "./Category";
-import TagResult from "./Tag";
-import ArchiveResult from "./Archive";
+import ResultCategory from "./ResultCategory";
+import ResultTag from "./ResultTag";
+import ResultArchive from "./ResultArchive";
 
 export default {
   name: "ResultPage",
@@ -26,7 +26,7 @@ export default {
     isMovileView: Boolean
   },
   components: {
-    CategoryResult, TagResult, ArchiveResult
+    ResultCategory, ResultTag,ResultArchive
   },
   methods: {
     receiveBlogData(data) {
