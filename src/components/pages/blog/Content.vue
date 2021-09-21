@@ -4,7 +4,10 @@
     <at-times :blogData="blogData"></at-times>
 
     <h4>{{ blogData.title | cut_gdid }}</h4>
-    <blog-tags :blogData="blogData"></blog-tags>
+    <blog-tags 
+    :blogData="blogData"
+    @tag-click="$listeners['tag-click']"
+    ></blog-tags>
     <vue-markdown class="markdown">
       {{ blogData.content }}
     </vue-markdown>

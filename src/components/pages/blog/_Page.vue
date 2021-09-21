@@ -21,6 +21,8 @@
             :blogData="blog"
             :isMovileView="isMovileView"
             @title-click="toggleContent(idx)"
+            @category-click="getCategoryBlog"
+            @tag-click="getTagBlog"
             v-show="showTitle"
           ></title-card>
 
@@ -29,6 +31,7 @@
             ref="content"
             :blogData="blog"
             :isMovileView="isMovileView"
+            @tag-click="getTagBlog"
             v-show="isOpenContent[idx]"
             ></content-card>
           </transition>
@@ -43,6 +46,7 @@
         :searchType="searchType"
         @category-click="getCategoryBlog"
         @tag-click="getTagBlog"
+        @ctime-click="getCtimeBlog"
         @title-click="toggleContent"
         @search-tofalse="indicateResultPage"
         ></result-page>
@@ -127,7 +131,7 @@ export default {
       this.contentIsOpenInit();
     },
     getCategoryBlog(bread = "") {
-      // this.blogs = this.blogsOrigin;
+      this.blogs = this.blogsOrigin;
       const category = bread;
       // 引数なし = 全件表示
       if (category === "") {
@@ -140,8 +144,16 @@ export default {
       this.contentIsOpenInit();
       this.onSearch = false;
     },
-    getTagBlog() {
-      console.log("ここを実装");
+    getTagBlog(tag) {
+      this.blogs = this.blogsOrigin;
+
+      this.blogs = this.blogs.filter(blog => blog.tag.includes(tag));
+      //コンテンツの開閉状態を初期化
+      this.contentIsOpenInit();
+      this.onSearch = false;
+    },
+    getCtimeBlog(ctime) {
+      console.log(ctime);
     },
     culcTotalHight(refs, limit) {
       let totalHeight = 0;

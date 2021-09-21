@@ -17,7 +17,12 @@
      @title-click2="$listeners['search-tofalse']"
      ></result-tag>
     
-    <result-archive v-if="searchType === 'archive'"></result-archive>
+    <result-archive v-if="searchType === 'archive'"
+    :blogs="blogs"
+    @ctime-click="$listeners['ctime-click']"
+    @title-click="$listeners['title-click']"
+    @title-click2="$listeners['search-tofalse']"
+    ></result-archive>
 
   </div>
 </template>

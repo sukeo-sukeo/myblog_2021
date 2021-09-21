@@ -94,6 +94,10 @@ aside {
 .menu {
   margin-bottom: 30px;
   display: flex;
+  cursor: pointer;
+}
+li.menu:hover {
+  text-decoration: underline;
 }
 .menu > span {
   padding-right: 10px;

@@ -1,27 +1,29 @@
 <template>
   
-  <div class="card hoverable row" :class="{horizontal: !isMovileView}" @click="$emit('title-click')">
+  <div class="card hoverable row" :class="{horizontal: !isMovileView}">
     
-
     <div class="card-image col s12 m4">
       <img class="responsive-img" :src="`data:image/png;base64,${blogData.thumImg}`">
       <span v-show="judgeNewContent()" class="new badge pulse red new_badge"></span>
-      <span class="badge grey white-text  category_badge">
+      <span class="badge grey white-text  category_badge"
+      @click="$emit('category-click',blogData.category)"
+      >
         {{ blogData.category }}
       </span>
     </div>
 
-
     <div class="card-staced col s12 m8">
-      <h5>{{ blogData.title | cut_gdid }}</h5>
+      <h5 class="blog_title"
+       @click="$emit('title-click')"
+       >{{ blogData.title | cut_gdid }}</h5>
       <at-times :blogData="blogData"></at-times>
 
       <div class="divider"></div>
       
-      <blog-tags class="blog_tags" :blogData="blogData"></blog-tags>
+      <blog-tags class="blog_tags" :blogData="blogData"
+      @tag-click="$listeners['tag-click']"
+      ></blog-tags>
     </div>
-
-    
 
   </div>
 </template>
@@ -119,6 +121,9 @@ export default {
   left: 10px;
   z-index: 10;
   margin: 5px;
+}
+.category_badge:hover, .blog_title:hover {
+  text-decoration: underline;
 }
 
 .material-icons {

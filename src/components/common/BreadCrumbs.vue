@@ -80,4 +80,7 @@ export default {
 .breadcrumb {
   cursor: pointer;
 }
+.breadcrumb:hover {
+  text-decoration: underline;
+}
 </style>

@@ -19,6 +19,7 @@ Vue.filter("cut_gdid", (val) => {
     return val;
   }
 })
+Vue.filter("add_pref", (val) => "▶ " + val)
 
 new Vue({
   router,

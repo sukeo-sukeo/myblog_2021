@@ -1,7 +1,10 @@
 <template>
   <div class="content">
     <div>
-      <small class="chip" v-for="(count, key) in tags" :key="key">
+      <small class="chip"
+       v-for="(count, key) in tags" :key="key"
+       @click="$emit('tag-click', key)"
+       >
         <a class="archive archive_category">{{key}}</a>
       </small>
     </div>
@@ -12,13 +15,15 @@
         </li>
         <ul>
           <li class="archive archive_post" v-for="blog in blogs" :key="blog.uid">
-            <a @click="$emit('title-click', getIdx(blog.uid)); $emit('title-click2')"
-            >
-              {{blog.tag.indexOf(key) !== -1 ? '▶ ' + blog.title : "" | cut_gdid}}
-            </a>
+            <template v-if="blog.tag.indexOf(key) !== -1">
+              <a @click="$emit('title-click', getIdx(blog.uid)); $emit('title-click2')"
+              >
+                {{blog.title | cut_gdid | add_pref}}
+              </a>
+            </template>
           </li>
         </ul>
-        <hr>
+        <div class="divider"></div>
       </ul>
     </div>
     
@@ -43,7 +48,6 @@ export default {
         return prev;
       }, {});
 
-      console.log(count);
       this.tags = count;
     },
     getIdx(uid) {
@@ -61,10 +65,13 @@ export default {
 .archive {
   cursor: pointer;
 }
+.archive:hover {
+  text-decoration: underline;
+}
 .archive_category {
   color: #0000EE;
 }
 .archive_post {
-  margin-left: 30px;
+  margin: 20px 0 10px 30px;
 }
 </style>
