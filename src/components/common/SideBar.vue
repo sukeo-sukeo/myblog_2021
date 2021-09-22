@@ -4,14 +4,15 @@
       style="position: absolute;"
       :bgColor="'#313251'"
       :colorNum="59"
-      :circleNum="10"
+      :circleNum="8"
       :circleSpeed="'fast'"
       :circleSize="'small'"
       :moveType="'vert'"
     ></vue-bubbly-bg>
     <div class="menu_wrapper">
       <ul class="menu_container">
-        <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event)"><mt-icon :iconName="menu.icon"></mt-icon>{{ menu.name }}</li>
+        <li class="menu menu_title">サイドバー調整中</li>
+        <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event)"><mt-icon :iconName="menu.icon"></mt-icon><a class="menu_name">{{ menu.name }}</a></li>
       </ul>
     </div>
   </aside>
@@ -28,7 +29,6 @@ export default {
   },
   data: () => ({
     menus: [
-      {name: "サイドバー調整中", icon: "", link: "", event: ""},
       {name: "ホーム", icon: "home", link: "", event: "home"},
       {name: "カテゴリ", icon: "label", link: "", event: "category"},
       {name: "タグ", icon: "bookmark", link: "", event: "tag"},
@@ -43,12 +43,15 @@ export default {
     event(eventName) {
       console.log(eventName);
       switch (eventName) {
+        case "home":
+          location.reload();
+          break;
         case "category":
         case "tag":
         case "archive":
-          // blogPageコンポーネントへ
+          // blogPageコンポーネントでon
           this.$eventHub.$emit("sidemenu-click", eventName)
-          // blogPageコンポーネントへ
+          // blogPageコンポーネントでon
           this.$eventHub.$emit("open-init")
           break;
         default:
@@ -96,7 +99,7 @@ aside {
   display: flex;
   cursor: pointer;
 }
-li.menu:hover {
+.menu_name:hover {
   text-decoration: underline;
 }
 .menu > span {

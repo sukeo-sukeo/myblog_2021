@@ -153,7 +153,12 @@ export default {
       this.onSearch = false;
     },
     getCtimeBlog(ctime) {
-      console.log(ctime);
+      this.blogs = this.blogsOrigin;
+
+      this.blogs = this.blogs.filter(blog => blog.createdAt.includes(ctime));
+      //コンテンツの開閉状態を初期化
+      this.contentIsOpenInit();
+      this.onSearch = false;
     },
     culcTotalHight(refs, limit) {
       let totalHeight = 0;
