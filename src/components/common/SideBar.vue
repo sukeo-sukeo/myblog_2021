@@ -12,7 +12,7 @@
     <div class="menu_wrapper">
       <ul class="menu_container">
         <li class="menu menu_title">サイドバー調整中</li>
-        <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event)"><mt-icon :iconName="menu.icon"></mt-icon><a class="menu_name">{{ menu.name }}</a></li>
+        <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event); isMovileView ? $emit('menu-click'): ''"><mt-icon :iconName="menu.icon"></mt-icon><a class="menu_name">{{ menu.name }}</a></li>
       </ul>
     </div>
   </aside>
@@ -25,7 +25,8 @@ import VueBubblyBg from '../atoms/VueBubblyBg';
 export default {
   name: 'SideBar',
   props: {
-    c_Height: [Object]
+    c_Height: [Object],
+    isMovileView: Boolean 
   },
   data: () => ({
     menus: [
