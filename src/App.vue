@@ -16,6 +16,7 @@
       v-if="sideIsOpen"
       :c_Height="c_Height"
       :isMovileView="isMovileView"
+      :routeData="routeData"
       @menu-click="sideBarBtn"
       ></side-bar>
     </transition>

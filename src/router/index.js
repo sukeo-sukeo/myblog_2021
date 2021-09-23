@@ -10,11 +10,6 @@ const routes = [
     name: "Blog",
     component: Blog,
   },
-  // {
-  //   path: "/blog/category",
-  //   name: "category",
-  //   component: "",
-  // },
   {
     path: "/product",
     name: "Product",

@@ -43,7 +43,7 @@ export default {
     blogsOrigin: [Array, Object, Function],
   },
   components: {
-    ResultCategory, ResultTag,ResultArchive
+    ResultCategory, ResultTag, ResultArchive
   },
   methods: {
   },

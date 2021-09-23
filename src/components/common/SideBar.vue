@@ -11,8 +11,19 @@
     ></vue-bubbly-bg>
     <div class="menu_wrapper">
       <ul class="menu_container">
-        <li class="menu menu_title">サイドバー調整中</li>
-        <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event); isMovileView ? $emit('menu-click'): ''"><mt-icon :iconName="menu.icon"></mt-icon><a class="menu_name">{{ menu.name }}</a></li>
+        <li class="menu menu_title">備忘録</li>
+        <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event); isMovileView ? $emit('menu-click'): ''"><mt-icon :iconName="menu.icon"></mt-icon>
+          <template v-if="menu.link">
+            <a :href="menu.link" target="_blank" class="menu_name">
+              {{ menu.name }}
+            </a>
+          </template>
+          <template v-else>
+            <a class="menu_name">
+              {{ menu.name }}
+            </a>
+          </template>
+        </li>
       </ul>
     </div>
   </aside>
@@ -26,7 +37,8 @@ export default {
   name: 'SideBar',
   props: {
     c_Height: [Object],
-    isMovileView: Boolean 
+    isMovileView: Boolean,
+    routeData: [Object, Array]
   },
   data: () => ({
     menus: [
@@ -36,24 +48,31 @@ export default {
       {name: "アーカイブ", icon: "folder", link: "", event: "archive"},
       {name: "検索", icon: "search", link: "", event: "search"},
       {name: "プロフィール", icon: "account_circle", link: "", event: "profile"},
-      {name: "GitHub", icon: "forward", link: "", event: "github"},
-      {name: "Twitter", icon: "forward", link: "", event: "twitter"},
+      {name: "GitHub", icon: "forward", link: "https://github.com/sukeo-sukeo", event: "github"},
+      {name: "Twitter", icon: "forward", link: "https://twitter.com/sukeo_sukeo", event: "twitter"},
     ]
   }),
   methods: {
     event(eventName) {
-      console.log(eventName);
       switch (eventName) {
         case "home":
+          this.routerPush("/");
           location.reload();
           break;
         case "category":
         case "tag":
         case "archive":
-          // blogPageコンポーネントでon
-          this.$eventHub.$emit("sidemenu-click", eventName)
-          // blogPageコンポーネントでon
-          this.$eventHub.$emit("open-init")
+        case "serach":
+          this.routerPush("/");
+          setTimeout(() => {
+            // blogPageコンポーネントでon
+            this.$eventHub.$emit("sidemenu-click", eventName);
+            // blogPageコンポーネントでon
+            this.$eventHub.$emit("open-init");
+          }, 200)
+          break;
+        case "profile":
+          this.routerPush("/profile");
           break;
         default:
           break;
@@ -64,6 +83,12 @@ export default {
         top: headerHeight,
         behavior: 'smooth'
       });
+    },
+    routerPush(path) {
+      // 現在いるページ以外のときはページ遷移
+      if (this.$route.path !== path) {
+        this.$router.push(path);
+      }
     }
   },
   components: {
@@ -71,7 +96,6 @@ export default {
     MtIcon
   },
   mounted() {
-   
   }
 }
 </script>
