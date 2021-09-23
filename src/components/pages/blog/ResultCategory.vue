@@ -1,5 +1,9 @@
 <template>
   <div class="content">
+    <!-- <search-box
+    :searchType="searchType"
+    :blogs="blogs"
+    ></search-box> -->
     <ul>
       <li :class="`archive_post_${key.trim()}`" v-for="(count, key) in categorys" :key="key">
         <a class="archive archive_category">{{key}}</a>
@@ -27,13 +31,17 @@
 </template>
 
 <script>
+// import SearchBox from "./SearchBox";
+
 export default {
   name: "ResultCategory",
+  // components: {SearchBox},
   data: () => ({
     categorys: Object
   }),
   props: {
     blogs: [Array, Object],
+    searchType: String
   },
   methods: {
     createCountData() {

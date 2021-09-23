@@ -62,7 +62,6 @@ export default {
         case "category":
         case "tag":
         case "archive":
-        case "serach":
           this.routerPush("/");
           setTimeout(() => {
             // blogPageコンポーネントでon
@@ -70,6 +69,12 @@ export default {
             // blogPageコンポーネントでon
             this.$eventHub.$emit("open-init");
           }, 200)
+          break;
+        case "search":
+          // this.routerPush("/");
+          // setTimeout(() => {
+          //   alert("searchbox apeare!")
+          // },200);
           break;
         case "profile":
           this.routerPush("/profile");

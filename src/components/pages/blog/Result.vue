@@ -1,9 +1,10 @@
 <template>
   <div>
-    <!-- <h6>{{searchType}}検索</h6> -->
+    
     <result-category
      v-if="searchType === 'category'"
      :blogs="blogs"
+     :searchType="searchType"
      @category-click="$listeners['category-click']"
      @title-click="$listeners['title-click']"
      @title-click2="$listeners['search-tofalse']"
@@ -12,6 +13,7 @@
     <result-tag
      v-if="searchType === 'tag'"
      :blogs="blogs"
+     :searchType="searchType"
      @tag-click="$listeners['tag-click']"
      @title-click="$listeners['title-click']"
      @title-click2="$listeners['search-tofalse']"
@@ -19,6 +21,7 @@
     
     <result-archive v-if="searchType === 'archive'"
     :blogs="blogs"
+    :searchType="searchType"
     @ctime-click="$listeners['ctime-click']"
     @title-click="$listeners['title-click']"
     @title-click2="$listeners['search-tofalse']"

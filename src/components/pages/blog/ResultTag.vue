@@ -1,5 +1,9 @@
 <template>
   <div class="content">
+    <!-- <search-box
+    :searchType="searchType"
+    :blogs="blogs"
+    ></search-box> -->
     <div>
       <small class="chip"
        v-for="(count, key) in tags" :key="key"
@@ -31,13 +35,17 @@
 </template>
 
 <script>
+// import SearchBox from "./SearchBox";
+
 export default {
   name: "ResultTag",
+  // components: {SearchBox},
   data: () => ({
     tags: Object
   }),
   props: {
     blogs: [Array, Object],
+    searchType: String
   },
   methods: {
     createCountData() {

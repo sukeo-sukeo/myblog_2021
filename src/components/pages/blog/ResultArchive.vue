@@ -1,5 +1,9 @@
 <template>
   <div class="content">
+    <!-- <search-box
+    :searchType="searchType"
+    :blogs="blogs"
+    ></search-box> -->
     <ul :class="`archive_year archive_post_${key.trim()}`" v-for="(count, key) in ctimes" :key="key">
       <!-- <div v-if="key.length !== 4" class="divider"></div> -->
       <li class="archive archive_title" @click="$emit('ctime-click', key)">
@@ -33,19 +37,23 @@
 </template>
 
 <script>
+// import SearchBox from "./SearchBox";
+
 export default {
   name: "ResultArchive",
+  // components: {SearchBox},
   data: () => ({
     ctimes: Object
   }),
   props: {
     blogs: [Array, Object],
+    searchType: String
   },
   methods: {
     createCountData() {
       const ctimes = this.blogs.map(blog => blog.createdAt);
       // yyyy-mm-dd
-      console.log(ctimes);
+      // console.log(ctimes);
       const count = ctimes.reduce((prev, current) => {
         const y = current.split("-")[0];
         const m = current.split("-")[1];
