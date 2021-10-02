@@ -127,8 +127,7 @@ export default {
       }
     },
     judgeBaseURL() {
-      if (location.href.includes('localhost') ||
-          location.href.includes('192')) {
+      if (location.href.includes('localhost')) {
         this.baseURL = "http://localhost:3030"
       } else {
         this.baseURL = "https://sukeo.live-on.net";

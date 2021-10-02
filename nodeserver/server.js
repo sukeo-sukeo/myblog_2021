@@ -26,17 +26,17 @@ let apiPath = String;
 const USER = process.env.USER;
 if (USER === "root") {
   // product
-  filePath = `/var/www/html/blogs`;
-  apiPath = "/";
+  filePath = `/usr/share/nginx/blogs`;
+  // apiPath = "/node/";
 } else {
   // local
   filePath = `${__dirname}/blogs/`;
-  apiPath = "/node/";
+  // apiPath = "/node/";
 }
 
 // ブログデータを取得
-app.get(apiPath, async (req, res) => {
-  console.log(USER);
+app.get("/node/", async (req, res) => {
+  // console.log(USER);
   const fileNames = await getFileNames(filePath);
   const fileInfos = await getFileInfos(fileNames, filePath);
   const contents = await getContents(fileNames, filePath);
@@ -49,7 +49,7 @@ app.get(apiPath, async (req, res) => {
 });
 
 // githubからレポジトリ情報を取得
-app.get(apiPath + "product", async (req, res) => {
+app.get("/node/product", async (req, res) => {
   const GITHUB_API_URL = "https://api.github.com";
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const USERNAME = "sukeo-sukeo";
@@ -65,7 +65,7 @@ app.get(apiPath + "product", async (req, res) => {
     });
 
   let dataList = [];
-  for (result of results) {
+  for (let result of results) {
     // パブリックリポジトリのみ
     // 右端の説明欄にURLが記載されているリポジトリのみ
     if (!result.private && result.homepage) {
@@ -93,7 +93,7 @@ app.get(apiPath + "product", async (req, res) => {
 });
 
 // twitterから情報を取得
-app.get(apiPath + "profile", async (req, res) => {
+app.get("/node/profile", async (req, res) => {
   const client = new Twitter({
     consumer_key: process.env.TWITTER_APIKEY,
     consumer_secret: process.env.TWITTER_SECRET_KEY,
@@ -115,10 +115,10 @@ app.get(apiPath + "profile", async (req, res) => {
 app.post(apiPath, async (req, res) => {
   let title = req.body.title;
   let content = req.body.content;
-  
+
   const [thumnailId, thumnailURL] = getThumnailId(content);
   const [imgIds, imgUrls] = getImgIds(content);
-  
+
   let blogPath_from = String;
   let blogPath_to = String;
   let thumnailPath_from = String;
@@ -135,9 +135,13 @@ app.post(apiPath, async (req, res) => {
     thumnailPath_from = `${filePath}/img/gas/${thumnailId}.png`;
     thumnailPath_to = `/Users/yusuke/Desktop/mddir/img/gas/${thumnailId}.png`;
     thumnailPath = `img/gas/${thumnailId}.png`;
-    imgPaths_from = imgIds.map(imgId => `${filePath}/img/gas/content/${imgId}.png`)
-    imgPaths_to = imgIds.map(imgId => `/Users/yusuke/Desktop/mddir/img/gas/content/${imgId}.png`)
-    imgPaths = imgIds.map(imgId => `img/gas/content/${imgId}.png`);
+    imgPaths_from = imgIds.map(
+      (imgId) => `${filePath}/img/gas/content/${imgId}.png`
+    );
+    imgPaths_to = imgIds.map(
+      (imgId) => `/Users/yusuke/Desktop/mddir/img/gas/content/${imgId}.png`
+    );
+    imgPaths = imgIds.map((imgId) => `img/gas/content/${imgId}.png`);
   } else {
     // local
     // blogs/test をサーバー blogs/ をローカルに見立ててscpする
@@ -146,15 +150,21 @@ app.post(apiPath, async (req, res) => {
     thumnailPath_from = `${__dirname}/blogs/img/imgtest/${thumnailId}.png`;
     thumnailPath_to = `${__dirname}/blogs/img/${thumnailId}.png`;
     thumnailPath = `img/${thumnailId}.png`;
-    imgPaths_from = imgIds.map(imgId => `${__dirname}/blogs/img/imgtest/${imgId}.png`)
-    imgPaths_to = imgIds.map(imgId => `${__dirname}/blogs/img/gasContent/${imgId}.png`)
-    imgPaths = imgIds.map(imgId => `img/gasContent/${imgId}.png`);
+    imgPaths_from = imgIds.map(
+      (imgId) => `${__dirname}/blogs/img/imgtest/${imgId}.png`
+    );
+    imgPaths_to = imgIds.map(
+      (imgId) => `${__dirname}/blogs/img/gasContent/${imgId}.png`
+    );
+    imgPaths = imgIds.map((imgId) => `img/gasContent/${imgId}.png`);
   }
-  
+
   // blog記事内のthumnailURLをサーバー内の画像へのpathに置換
   content = content.replace(thumnailURL, thumnailPath);
   // blog記事内のimgURLをサーバー内の画像へのpathに置換
-  imgUrls.forEach((imgUrl, i) => content = content.replace(imgUrl, imgPaths[i]));
+  imgUrls.forEach(
+    (imgUrl, i) => (content = content.replace(imgUrl, imgPaths[i]))
+  );
 
   // blogファイルをサーバーへ保存
   await fs.writeFile(blogPath_from, content);
@@ -164,25 +174,26 @@ app.post(apiPath, async (req, res) => {
     await fs.chown(blogPath_from, uid, gid);
   }
 
-  
   // google drive からサムネイルを取得&リサイズ → サーバーへ保存
   await fetchImgAndResize(thumnailPath_from, thumnailId);
   // google drive からコンテント内で使用の画像を取得&リサイズ → サーバーへ保存
-  imgPaths_from.forEach((imgPath_from, i) => fetchImgAndResize(imgPath_from, imgIds[i]))
-  
+  imgPaths_from.forEach((imgPath_from, i) =>
+    fetchImgAndResize(imgPath_from, imgIds[i])
+  );
 
   // ブログ記事をローカルへコピー
   await scpFile(blogPath_from, blogPath_to);
   // サムネイルをローカルへコピー
-  await scpFile(thumnailPath_from, thumnailPath_to)
+  await scpFile(thumnailPath_from, thumnailPath_to);
   // コンテント内画像をローカルへコピー
-  imgPaths_from.forEach((imgPath_from, i) => scpFile(imgPath_from, imgPaths_to[i]))
+  imgPaths_from.forEach((imgPath_from, i) =>
+    scpFile(imgPath_from, imgPaths_to[i])
+  );
 
   res.send("投稿が完了しました!");
 });
 
 const fetchImgAndResize = async (output, id) => {
-
   // 画像をサーバーへDLし保存
   const url = `https://drive.google.com/uc?export=download&id=${id}`;
   await wget(url, { output });
@@ -205,29 +216,28 @@ const fetchImgAndResize = async (output, id) => {
   //   // 画像を上書き
   //   // await fs.writeFile(output, resizedImg);
   // }
-}
+};
 
 // 封印 => 投稿側で調整
 const imgResize = async (img, width, height, output) => {
   console.log(width, height);
   height = 500;
   width = parseInt(height * 0.75);
-  console.log(width,height);
+  console.log(width, height);
   const option = {
     fit: "contain",
-    background: {r: 255, g: 255, b: 255},
+    background: { r: 255, g: 255, b: 255 },
   };
-  
-  await sharp(img).resize(width, height, option).toFile(output);
+
+  await sharp(img)
+    .resize(width, height, option)
+    .toFile(output);
   // const resizedImg = await sharp(img).resize(WIDTH, HEIGHT, option).png().toBuffer();
   // return resizedImg;
-}
-
+};
 
 const getThumnailId = (content) => {
-  const url = content
-    .split("![thumnail](")[1]
-    .split(")")[0];
+  const url = content.split("![thumnail](")[1].split(")")[0];
   const id = url.split("id=")[1];
   return [id, url];
 };
@@ -237,22 +247,22 @@ const getImgIds = (content) => {
   const urlAry1 = content.split(tage);
   const urlAry2 = urlAry1.slice(1, urlAry1.length);
 
-  const urls = urlAry2.map(val => {
+  const urls = urlAry2.map((val) => {
     const start = 0;
     const end = val.indexOf(")");
     const url = val.slice(start, end);
-    return url
+    return url;
   });
 
-  const ids = urlAry2.map(val => {
+  const ids = urlAry2.map((val) => {
     const start = val.indexOf("=") + 1;
     const end = val.indexOf(")");
     const id = val.slice(start, end);
-    return id
+    return id;
   });
 
-  return [ids, urls]
-}
+  return [ids, urls];
+};
 
 const scpFile = async (path_from, path_to) => {
   try {

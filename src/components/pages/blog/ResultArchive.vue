@@ -5,32 +5,40 @@
     :blogs="blogs"
     ></search-box> -->
     <ul :class="`archive_year archive_post_${key.trim()}`" v-for="(count, key) in ctimes" :key="key">
-      <!-- <div v-if="key.length !== 4" class="divider"></div> -->
       <li class="archive archive_title" @click="$emit('ctime-click', key)">
-        <a>{{key}}年({{count[key]}})</a>
+        <a>
+          <h5>
+            {{key}}年({{count[key]}})
+          </h5> 
+        </a>
       </li>
 
-      <ul class="arcive_month" v-for="(count2, key2) in ctimes[key]" :key="key2">
-        <template v-if="key2.length === 2">
+      <template v-for="(count2, key2) in ctimes[key]">
+        <ul class="archive_head z-depth-2" 
+        v-if="key2.length === 2"
+        :key="key2">
           <li class="archive archive_title"
           @click="$emit('ctime-click', key2)">
-            <a>{{key2}}月({{count2}})</a>
+            <a><h5>{{key2}}月({{count2}})</h5></a>
           </li>
-          <ul class="archive archive_post" v-for="blog in blogs" :key="blog.uid">
-            <template v-if="blog.createdAt.split('-')[1].indexOf(key2) !== -1">
-              <li>
-                <a @click="$emit('title-click', getIdx(blog.uid)); $emit('title-click2')"
-                >
-                  {{blog.title | cut_gdid | add_pref}}
-                  <span> - </span>
-                  {{blog.createdAt.replace(/-/g, "/")}}
-                </a>
-              </li>
-            </template>
-          </ul>
-        </template>
-
-      </ul>
+          <template v-for="blog in blogs">
+            <li class="archive archive_post"
+            v-if="blog.createdAt.split('-')[1].indexOf(key2) !== -1"
+            :key="blog.uid">
+              <a @click="$emit('title-click', getIdx(blog.uid)); $emit('title-click2')"
+              >
+                {{blog.title | cut_gdid | add_pref}}
+                <span class="grey-text"> - </span>
+                <span class="grey-text">
+                {{blog.createdAt.replace(/-/g, "/")}}
+                </span>
+              </a>
+            </li>
+          </template>
+          <!-- <div class="divider"></div> -->
+        </ul>
+      </template>
+  
     </ul>
     
   </div>
@@ -75,7 +83,7 @@ export default {
     getIdx(uid) {
       const idx = this.blogs.map(blog => blog.uid).indexOf(uid);
       return idx
-    }
+    },
   },
   mounted() {
     this.createCountData();
@@ -96,7 +104,9 @@ export default {
 .archive_post {
   margin: 20px 0 10px 30px;
 }
-.archive_month {
-  margin: 20px 0 10px 30px;
+.archive_head {
+  margin: 20px;
+  padding: 15px;
+  border-radius: 5px;
 }
 </style>

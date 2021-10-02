@@ -121,7 +121,8 @@ export default {
       this.searchType = menuName;
     },
     async fetchBlog() {
-      const blogs = await this.$axios.get(`${this.baseURL}/node`).then((res) => res.data);
+      // const apiPath = "/api/v1/blogs"
+      const blogs = await this.$axios.get(`${this.baseURL}/node/`).then((res) => res.data);
 
       // console.log(blogs);
       this.blogs = blogs;

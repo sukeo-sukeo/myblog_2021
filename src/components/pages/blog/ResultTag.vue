@@ -5,15 +5,16 @@
     :blogs="blogs"
     ></search-box> -->
     <div>
-      <small class="chip"
+      <small @click="moveto"
+      :class="`archive_post_${key.trim()}`"
+       class="chip"
        v-for="(count, key) in tags" :key="key"
-       @click="$emit('tag-click', key)"
        >
         <a class="archive archive_category">{{key}}</a>
       </small>
     </div>
     <div>
-      <ul :class="`archive_post_${key.trim()}`" v-for="(count, key) in tags" :key="key">
+      <ul ref="movetoContainer" :class="`archive_post_${key.trim()}`" v-for="(count, key) in tags" :key="key">
         <li class="archive archive_title" @click="$emit('tag-click', key)">
           <a>{{key}}({{count}})</a>
         </li>
@@ -61,6 +62,15 @@ export default {
     getIdx(uid) {
       const idx = this.blogs.map(blog => blog.uid).indexOf(uid);
       return idx
+    },
+    moveto(e) {
+      const moveto = e.target.parentNode.className.split(" ")[1];
+      const refs = this.$refs.movetoContainer;
+      const [targetContainer] = refs.filter(ref => ref.className === moveto);
+      scrollTo({
+        top: targetContainer.offsetTop,
+        behavior: 'smooth'
+      });
     }
   },
   mounted() {

@@ -4,14 +4,15 @@
       style="position: absolute;"
       :bgColor="'#313251'"
       :colorNum="59"
-      :circleNum="8"
+      :circleNum="6"
       :circleSpeed="'fast'"
       :circleSize="'small'"
       :moveType="'vert'"
     ></vue-bubbly-bg>
+
     <div class="menu_wrapper">
       <ul class="menu_container">
-        <li class="menu menu_title">備忘録</li>
+        <li class="menu menu_title">明日への備忘録</li>
         <li class="menu" v-for="menu in menus" :key="menu.name" @click="event(menu.event); isMovileView ? $emit('menu-click'): ''"><mt-icon :iconName="menu.icon"></mt-icon>
           <template v-if="menu.link">
             <a :href="menu.link" target="_blank" class="menu_name">
@@ -26,6 +27,7 @@
         </li>
       </ul>
     </div>
+    
   </aside>
 </template>
 
@@ -46,7 +48,7 @@ export default {
       {name: "カテゴリ", icon: "label", link: "", event: "category"},
       {name: "タグ", icon: "bookmark", link: "", event: "tag"},
       {name: "アーカイブ", icon: "folder", link: "", event: "archive"},
-      {name: "検索", icon: "search", link: "", event: "search"},
+      // {name: "検索", icon: "search", link: "", event: "search"},
       {name: "プロフィール", icon: "account_circle", link: "", event: "profile"},
       {name: "GitHub", icon: "forward", link: "https://github.com/sukeo-sukeo", event: "github"},
       {name: "Twitter", icon: "forward", link: "https://twitter.com/sukeo_sukeo", event: "twitter"},
