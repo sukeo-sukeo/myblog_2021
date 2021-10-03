@@ -5,8 +5,8 @@
     :blogs="blogs"
     ></search-box> -->
     <ul>
-      <li @click="moveto" :class="`archive_post_${key.trim()}`" v-for="(count, key) in categorys" :key="key">
-        <a class="archive archive_category">{{key}}</a>
+      <li :class="`archive_post_${key.trim()}`" v-for="(count, key) in categorys" :key="key">
+        <a class="archive archive_category" @click="moveto">{{key}}</a>
       </li>
     </ul>
     <div>
@@ -81,6 +81,7 @@ export default {
 <style scoped>
 .archive {
   cursor: pointer;
+  width: fit-content;
 }
 .archive:hover {
   text-decoration: underline;

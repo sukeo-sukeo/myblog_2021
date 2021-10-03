@@ -63,7 +63,7 @@ app.get("/node/product", async (req, res) => {
     .then((data) => {
       return data;
     });
-
+  
   let dataList = [];
   for (let result of results) {
     // パブリックリポジトリのみ

@@ -217,7 +217,7 @@ export default {
         root: 'HOME',
         sub: this.routeData[0].name.toUpperCase(),
         category: blog.category,
-        title: blog.title.length >= 30? blog.title.slice(0,30) + "..." : blog.title
+        title: blog.title
       }
     },
     // getCommnets() {
@@ -282,7 +282,7 @@ export default {
       })
     });
 
-    setTimeout(() => this.setLineNumbers(), 1000)
+    setTimeout(() => this.setLineNumbers(), 2000)
     
     
     // 'HOME', this.routeData[0].name.toUpperCase(), blog.category , blog.title]

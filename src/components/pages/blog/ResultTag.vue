@@ -14,21 +14,21 @@
       </small>
     </div>
     <div>
-      <ul ref="movetoContainer" :class="`archive_post_${key.trim()}`" v-for="(count, key) in tags" :key="key">
+      <ul ref="movetoContainer" :class="`archive_post_${key.trim()}`"
+      class="z-depth-2 archive_head" 
+      v-for="(count, key) in tags" :key="key">
         <li class="archive archive_title" @click="$emit('tag-click', key)">
-          <a>{{key}}({{count}})</a>
+          <a><h5>{{key}}({{count}})</h5></a>
         </li>
-        <ul>
-          <li class="archive archive_post" v-for="blog in blogs" :key="blog.uid">
-            <template v-if="blog.tag.indexOf(key) !== -1">
-              <a @click="$emit('title-click', getIdx(blog.uid)); $emit('title-click2')"
-              >
-                {{blog.title | cut_gdid | add_pref}}
-              </a>
-            </template>
+        <template v-for="blog in blogs">
+          <li :key="blog.uid" class="archive archive_post"
+          v-if="blog.tag.indexOf(key) !== -1">
+            <a @click="$emit('title-click', getIdx(blog.uid)); $emit('title-click2')"
+            >
+              {{blog.title | cut_gdid | add_pref}}
+            </a>
           </li>
-        </ul>
-        <div class="divider"></div>
+        </template>
       </ul>
     </div>
     
@@ -66,7 +66,10 @@ export default {
     moveto(e) {
       const moveto = e.target.parentNode.className.split(" ")[1];
       const refs = this.$refs.movetoContainer;
-      const [targetContainer] = refs.filter(ref => ref.className === moveto);
+      const [targetContainer] = refs.filter(ref => {
+        const classNameArry = ref.className.split(" ");
+        return classNameArry.slice(-1)[0] === moveto
+      });
       scrollTo({
         top: targetContainer.offsetTop,
         behavior: 'smooth'
@@ -82,6 +85,7 @@ export default {
 <style scoped>
 .archive {
   cursor: pointer;
+  width: fit-content;
 }
 .archive:hover {
   text-decoration: underline;
@@ -91,5 +95,10 @@ export default {
 }
 .archive_post {
   margin: 20px 0 10px 30px;
+}
+.archive_head {
+  margin: 20px 0px;
+  padding: 15px;
+  border-radius: 5px;
 }
 </style>

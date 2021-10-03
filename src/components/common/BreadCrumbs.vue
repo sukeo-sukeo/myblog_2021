@@ -3,7 +3,7 @@
 <!-- ルーティングの方法に改善が必要... -->
   <nav class="bread_wrapper">
     <div class="nav-wrapper row red">
-      <div class="col s12">
+      <div class="col s12 crumb_wrapper">
         <span class="breadcrumb"
         :class="{movile_fontsize: isMovileView}"
         v-for="(bread, key) in breads" :key="bread"
@@ -69,6 +69,10 @@ export default {
   height: 30px;
   line-height: 30px;
   margin-bottom: 10px;
+}
+.crumb_wrapper {
+  overflow-x: scroll;
+  white-space: pre;
 }
 .movile_fontsize {
   font-size: 12px;

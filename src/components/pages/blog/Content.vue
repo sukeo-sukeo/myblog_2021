@@ -94,7 +94,9 @@ export default {
   font-weight: bold;
   filter: drop-shadow(2px 4px 6px wheat);
   width: fit-content;
-  border-left: 40px solid wheat;
+  border-left: 8px solid wheat;
+  border-bottom: 3px solid wheat;
+  width: auto;
   padding-left: 10px;
 }
 .markdown >>> h2 {

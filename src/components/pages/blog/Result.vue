@@ -61,7 +61,7 @@ export default {
 <style scoped>
 result-category, .content {
   background: white;
-  padding: 30px 50px;
+  padding: 30px 10px;
   border-radius: 5px;
   line-height: 1.8;
 }

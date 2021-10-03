@@ -4,13 +4,11 @@
     :searchType="searchType"
     :blogs="blogs"
     ></search-box> -->
-    <ul :class="`archive_year archive_post_${key.trim()}`" v-for="(count, key) in ctimes" :key="key">
-      <li class="archive archive_title" @click="$emit('ctime-click', key)">
-        <a>
-          <h5>
-            {{key}}年({{count[key]}})
-          </h5> 
-        </a>
+    <ul :class="`archive_post_${key.trim()}`" v-for="(count, key) in ctimes" :key="key">
+      <li>
+        <a class="archive archive_year"
+        @click="$emit('ctime-click', key)"
+        >{{key}}年({{count[key]}})</a>
       </li>
 
       <template v-for="(count2, key2) in ctimes[key]">
@@ -94,11 +92,12 @@ export default {
 <style scoped>
 .archive {
   cursor: pointer;
+  width: fit-content;
 }
 .archive:hover {
   text-decoration: underline;
 }
-.archive_category {
+.archive_year {
   color: #0000EE;
 }
 .archive_post {
